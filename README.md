@@ -37,46 +37,47 @@ flowchart LR
 ```
 
 ### 1. Explainable Match Intelligence (Phase 1 & 2)
-- **Single Source of Truth**: Algorithmic scoring executed exclusively in [`CandidateJobMatchService.cls`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/classes/CandidateJobMatchService.cls) and stored in [`Candidate_Job_Match__c`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/objects/Candidate_Job_Match__c).
+- **Single Source of Truth**: Algorithmic scoring executed exclusively in [`CandidateJobMatchService.cls`](force-app/main/default/classes/CandidateJobMatchService.cls) and stored in [`Candidate_Job_Match__c`](force-app/main/default/objects/Candidate_Job_Match__c).
 - **Explainable 4-Factor Formula**:
   - 🛠️ **Skills Match (50%)**: Jaccard token overlap between candidate skills and role requirements.
   - ⏳ **Experience Match (25%)**: Ratio of candidate career tenure against required threshold.
   - 🎓 **Qualification Match (15%)**: Educational hierarchy alignment (Doctorate $\ge$ Master's $\ge$ Bachelor's).
   - 📍 **Location Match (10%)**: Geographic proximity and remote eligibility matching.
-- **Explainability Artifacts**: Generates explicit positive rationales (`Match_Reasons__c`) and shortfall diagnostics (`Gap_Analysis__c`) rendered in the reactive [`candidateJobMatchPanel`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/lwc/candidateJobMatchPanel) LWC.
+- **Explainability Artifacts**: Generates explicit positive rationales (`Match_Reasons__c`) and shortfall diagnostics (`Gap_Analysis__c`) rendered in the reactive [`candidateJobMatchPanel`](force-app/main/default/lwc/candidateJobMatchPanel) LWC.
 
 ### 2. Multi-Candidate Comparison Engine (Phase 3)
-- Enables recruiters to select **2 to 5 candidates** for any job opening and generate side-by-side multi-dimensional comparative matrices via [`candidateComparisonView`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/lwc/candidateComparisonView).
+- Enables recruiters to select **2 to 5 candidates** for any job opening and generate side-by-side multi-dimensional comparative matrices via [`candidateComparisonPanel`](force-app/main/default/lwc/candidateComparisonPanel).
 - Compares normalized factor scores, cross-candidate skill overlap matrices, and relative strengths without black-box ranking.
 
 ### 3. Agentforce Recruitment Decision Copilot (Phase 4A)
 - Conversational AI powered by Salesforce Agentforce (`AI_Recruitment_Assistant.agent`).
-- Grounded via custom Invocable Apex actions (`CandidateJobMatchAction`, `CandidateComparisonAction`).
+- Grounded via custom Invocable Apex actions (`CandidateJobMatchAction`, `CandidateComparisonAction`, `RecruitmentPipelineSummaryAction`, `RecruitmentRiskAction`, `RecruitmentAlertAction`).
 - Natural language query examples:
   - *"How well does Jane Doe match the Senior Salesforce Architect role?"*
   - *"Compare candidates Jane Doe and John Smith for the Engineering Manager requisition."*
 - **Strictly Grounded**: Never invents or recalculates scores—strictly consumes verified `Candidate_Job_Match__c` records.
 
 ### 4. Recruitment Intelligence & Pipeline Analytics (Phase 4B)
-- Enterprise dashboard ([`recruitmentIntelligenceDashboard`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/lwc/recruitmentIntelligenceDashboard)) visualizing:
+- Enterprise dashboard ([`recruitmentIntelligenceDashboard`](force-app/main/default/lwc/recruitmentIntelligenceDashboard) & [`recruitmentHomeDashboard`](force-app/main/default/lwc/recruitmentHomeDashboard)) visualizing:
   - Overall pipeline stage velocity and applicant progression.
   - Requisition coverage ratios and talent deficits.
   - Departmental hiring throughput.
 
 ### 5. Risk & Bottleneck Intelligence (Phase 5)
-- Deterministic background detection driven by `Risk_Threshold_Configuration__mdt`:
+- Deterministic background detection driven by `Recruitment_Alert_Threshold__mdt`:
   - ⚠️ **Stalled Applications**: Candidates stationary in a stage for $>14$ calendar days.
   - ⚠️ **Unscheduled Interviews**: Qualified applicants awaiting interview scheduling for $>5$ days.
   - ⚠️ **Scorecard Bottlenecks**: Completed interviews lacking interviewer feedback after $>3$ business days.
-  - ⚠️ **Requisition Aging Risk**: Open roles approaching target hire date with $<3$ qualified applicants.
+  - ⚠️ **Requisition Aging Risk**: Open roles approaching target hire date with low applicant volume.
+- Surfaced via [`recruitmentAttentionPanel`](force-app/main/default/lwc/recruitmentAttentionPanel) and [`recruitmentAiAssistantPanel`](force-app/main/default/lwc/recruitmentAiAssistantPanel).
 
 ### 6. Recruiter Action Center & Audit Logging (Phase 6)
-- Operational workbench ([`recruiterActionCenter`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/lwc/recruiterActionCenter)) allowing recruiters to triage alerts and execute one-click interventions:
-  - `NUDGE_INTERVIEWER`: Sends prompt reminder notifications to interviewers.
-  - `SCHEDULE_INTERVIEW`: Triggers automated scheduling invitations.
-  - `SOURCE_CANDIDATES`: Escalates low-pipeline requisitions to talent sourcing.
-  - `FLAG_STALLED_APPLICATION`: Flags bottlenecked applications for hiring manager review.
-- **Audit Compliance**: Every action generates an immutable audit record in [`Recruiter_Action_Log__c`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/objects/Recruiter_Action_Log__c).
+- Operational workbench ([`recruiterActionCenter`](force-app/main/default/lwc/recruiterActionCenter)) allowing recruiters to triage alerts and execute one-click interventions:
+  - `Nudge Interviewer`: Sends prompt reminder notifications to interviewers.
+  - `Schedule Interview`: Triggers automated scheduling invitations.
+  - `Source Candidates`: Escalates low-pipeline requisitions to talent sourcing.
+  - `Flag Stalled Application`: Flags bottlenecked applications for hiring manager review.
+- **Audit Compliance**: Every alert and intervention is tracked and logged in [`Recruitment_Alert__c`](force-app/main/default/objects/Recruitment_Alert__c).
 
 ---
 
@@ -192,7 +193,7 @@ sf apex run test --test-level RunLocalTests --code-coverage --result-format huma
 
 - **122 / 122 Tests Passing** with zero failures.
 - **92% Org-Wide Code Coverage** across all 21 production Apex classes.
-- **Dedicated Security Test Suite** ([`RecruitmentSecurityTest.cls`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/classes/RecruitmentSecurityTest.cls)) validating:
+- **Dedicated Security Test Suite** ([`RecruitmentSecurityTest.cls`](force-app/main/default/classes/RecruitmentSecurityTest.cls)) validating:
   - Administrator full CRUD capability.
   - Recruiter zero-delete enforcement.
   - Hiring manager PII masking (inaccessible candidate phone numbers).
@@ -238,6 +239,6 @@ sf apex run test --test-level RunLocalTests --code-coverage --result-format huma
 
 ## 👤 Author & Acknowledgments
 
-- **Platform Architect & Developer**: Shaik Afrid
+- **Platform Architect & Developer**: Shaik Afrid ([@afrid995](https://github.com/afrid995))
 - **Technology Focus**: Salesforce DX, Apex Enterprise Patterns, Lightning Web Components, Agentforce AI, Responsible AI Architecture.
-- **Repository**: [Salesforce AI Recruitment Hub](https://github.com/)
+- **Repository**: [https://github.com/afrid995/salesforce-ai-recruitment-hub](https://github.com/afrid995/salesforce-ai-recruitment-hub)

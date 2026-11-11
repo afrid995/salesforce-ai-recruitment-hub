@@ -52,7 +52,7 @@ classDiagram
 
 ### Detailed Permission Set Specifications
 
-#### 1. [`Recruitment_Administrator`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/permissionsets/Recruitment_Administrator.permissionset-meta.xml)
+#### 1. [`Recruitment_Administrator`](../../force-app/main/default/permissionsets/Recruitment_Administrator.permissionset-meta.xml)
 - **Target Persona**: System Administrators, Talent Operations Leads.
 - **Permissions**:
   - Full CRUD on all 6 custom objects: `Job_Requisition__c`, `Candidate__c`, `Job_Application__c`, `Interview__c`, `Candidate_Job_Match__c`, `Recruiter_Action_Log__c`.
@@ -60,7 +60,7 @@ classDiagram
   - Read/Write access to Custom Metadata configurations (`Match_Weight_Configuration__mdt`, `Risk_Threshold_Configuration__mdt`).
   - Access to all 21 production Apex classes and management utilities.
 
-#### 2. [`Recruitment_Recruiter`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/permissionsets/Recruitment_Recruiter.permissionset-meta.xml)
+#### 2. [`Recruitment_Recruiter`](../../force-app/main/default/permissionsets/Recruitment_Recruiter.permissionset-meta.xml)
 - **Target Persona**: In-house Recruiters, Talent Acquisition Specialists.
 - **Permissions**:
   - Read, Create, Edit on core objects (`Candidate__c`, `Job_Requisition__c`, `Job_Application__c`, `Interview__c`).
@@ -69,7 +69,7 @@ classDiagram
   - Read-Only access to Custom Metadata.
   - Create and Read on `Recruiter_Action_Log__c` to execute actions via the Recruiter Action Center.
 
-#### 3. [`Recruitment_Hiring_Manager`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/permissionsets/Recruitment_Hiring_Manager.permissionset-meta.xml)
+#### 3. [`Recruitment_Hiring_Manager`](../../force-app/main/default/permissionsets/Recruitment_Hiring_Manager.permissionset-meta.xml)
 - **Target Persona**: Department Managers, Interview Panel Leads.
 - **Permissions**:
   - Read-Only on `Candidate__c`, `Job_Requisition__c`, and `Job_Application__c`.
@@ -77,7 +77,7 @@ classDiagram
   - Read-Only on `Candidate_Job_Match__c` to review match reasoning and candidate comparisons.
   - **PII Protection**: Field-Level Security removes visibility to candidate personal telephone numbers (`Candidate__c.Phone__c`), preserving privacy until direct interview contact is authorized.
 
-#### 4. [`Recruitment_Agent_User`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/permissionsets/Recruitment_Agent_User.permissionset-meta.xml)
+#### 4. [`Recruitment_Agent_User`](../../force-app/main/default/permissionsets/Recruitment_Agent_User.permissionset-meta.xml)
 - **Target Persona**: Dedicated Agentforce execution identity (`agent.user.<hash>@agentforce.com`).
 - **Permissions**:
   - Read-Only access to matching intelligence and requisitions.
@@ -170,7 +170,7 @@ For enterprise multi-tenant or multi-department deployments, the following archi
 
 The platform guarantees compliance, traceability, and human accountability:
 - **Zero Autonomous Execution**: Agentforce cannot unilaterally advance, reject, or hire candidates.
-- **Immutable Action Ledger**: Any outreach, nudge, or status flag triggered from the Recruiter Action Center persists an immutable entry in [`Recruiter_Action_Log__c`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/objects/Recruiter_Action_Log__c).
+- **Immutable Action Ledger**: Any outreach, nudge, or status flag triggered from the Recruiter Action Center persists an immutable entry in [`Recruiter_Action_Log__c`](../../force-app/main/default/objects/Recruiter_Action_Log__c).
 - **Execution Metadata Captured**:
   - `Action_Type__c`: Standardized action enumeration (`NUDGE_INTERVIEWER`, `SCHEDULE_INTERVIEW`, `SOURCE_CANDIDATES`, `FLAG_STALLED_APPLICATION`).
   - `Trigger_Reason__c`: Specific bottleneck condition that prompted recruiter intervention.

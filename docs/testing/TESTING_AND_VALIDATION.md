@@ -63,27 +63,27 @@ flowchart TD
 
 | Test Class | Target Production Classes | Focus & Key Scenarios |
 | :--- | :--- | :--- |
-| [`CandidateJobMatchServiceTest`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/classes/CandidateJobMatchServiceTest.cls) | `CandidateJobMatchService` | Validates multi-factor algorithm (50% skills, 25% exp, 15% qual, 10% loc), boundary conditions (0-100), and gap analysis text generation. |
-| [`CandidateJobMatchActionTest`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/classes/CandidateJobMatchActionTest.cls) | `CandidateJobMatchAction` | Validates Invocable Method inputs/outputs, bulk invocation, and JSON serialization for Agentforce consumption. |
-| [`CandidateJobMatchUIControllerTest`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/classes/CandidateJobMatchUIControllerTest.cls) | `CandidateJobMatchUIController` | Validates `@AuraEnabled` endpoints for `candidateJobMatchPanel` LWC, ensuring reactive UI data binding. |
-| [`CandidateComparisonControllerTest`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/classes/CandidateComparisonControllerTest.cls) | `CandidateComparisonController` | Tests 2–5 candidate comparison matrix generation, ranking normalization, and missing candidate handling. |
-| [`CandidateComparisonActionTest`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/classes/CandidateComparisonActionTest.cls) | `CandidateComparisonAction` | Tests Agentforce invocable comparison action with structured side-by-side DTO response. |
-| [`RecruitmentIntelligenceControllerTest`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/classes/RecruitmentIntelligenceControllerTest.cls) | `RecruitmentIntelligenceController` | Tests pipeline velocity calculation, stage conversion rates, and department-level aggregation. |
-| [`RecruitmentRiskServiceTest`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/classes/RecruitmentRiskServiceTest.cls) | `RecruitmentRiskService` | Tests deterministic risk triggers: Stalled applications (>14d), unscheduled interviews (>5d), feedback lag (>3d). |
-| [`RecruitmentRiskControllerTest`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/classes/RecruitmentRiskControllerTest.cls) | `RecruitmentRiskController` | Tests `@AuraEnabled` risk triage queries and filtering by severity (HIGH, MEDIUM, LOW). |
-| [`RecruiterActionServiceTest`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/classes/RecruiterActionServiceTest.cls) | `RecruiterActionService` | Validates action dispatch mechanics (`NUDGE_INTERVIEWER`, `SCHEDULE_INTERVIEW`, `SOURCE_CANDIDATES`, `FLAG_STALLED_APPLICATION`). |
-| [`RecruiterActionCenterControllerTest`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/classes/RecruiterActionCenterControllerTest.cls) | `RecruiterActionCenterController` | Validates Action Center UI payload delivery, action execution confirmation, and audit record creation. |
-| [`RecruiterActionCenterActionTest`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/classes/RecruiterActionCenterActionTest.cls) | `RecruiterActionCenterAction` | Tests Agentforce action dispatch interface for operational recruiter workflows. |
-| [`RecruitmentDataFactoryTest`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/classes/RecruitmentDataFactoryTest.cls) | `RecruitmentDataFactory` | Validates basic record provisioning and relationship integrity in test contexts. |
-| [`RecruitmentTestDataFactoryTest`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/classes/RecruitmentTestDataFactoryTest.cls) | `RecruitmentTestDataFactory` | Validates bulk generation of complex end-to-end recruitment scenarios with pre-configured matches and interviews. |
-| [`RecruitmentSecurityTest`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/classes/RecruitmentSecurityTest.cls) | All Production Classes | Dedicated multi-persona RBAC, FLS, and PII masking test suite executing negative and positive permissions tests. |
-| [`RecruitmentIntelligenceTest`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/classes/RecruitmentIntelligenceTest.cls) | Orchestration Classes | Validates cross-service workflows linking matches, risk detection, and action execution. |
+| [`CandidateJobMatchServiceTest`](../../force-app/main/default/classes/CandidateJobMatchServiceTest.cls) | `CandidateJobMatchService` | Validates multi-factor algorithm (50% skills, 25% exp, 15% qual, 10% loc), boundary conditions (0-100), and gap analysis text generation. |
+| [`CandidateJobMatchActionTest`](../../force-app/main/default/classes/CandidateJobMatchActionTest.cls) | `CandidateJobMatchAction` | Validates Invocable Method inputs/outputs, bulk invocation, and JSON serialization for Agentforce consumption. |
+| [`CandidateJobMatchUIControllerTest`](../../force-app/main/default/classes/CandidateJobMatchUIControllerTest.cls) | `CandidateJobMatchUIController` | Validates `@AuraEnabled` endpoints for `candidateJobMatchPanel` LWC, ensuring reactive UI data binding. |
+| [`CandidateComparisonControllerTest`](../../force-app/main/default/classes/CandidateComparisonControllerTest.cls) | `CandidateComparisonController` | Tests 2–5 candidate comparison matrix generation, ranking normalization, and missing candidate handling. |
+| [`CandidateComparisonActionTest`](../../force-app/main/default/classes/CandidateComparisonActionTest.cls) | `CandidateComparisonAction` | Tests Agentforce invocable comparison action with structured side-by-side DTO response. |
+| [`RecruitmentIntelligenceControllerTest`](../../force-app/main/default/classes/RecruitmentIntelligenceControllerTest.cls) | `RecruitmentIntelligenceController` | Tests pipeline velocity calculation, stage conversion rates, and department-level aggregation. |
+| [`RecruitmentRiskServiceTest`](../../force-app/main/default/classes/RecruitmentRiskServiceTest.cls) | `RecruitmentRiskService` | Tests deterministic risk triggers: Stalled applications (>14d), unscheduled interviews (>5d), feedback lag (>3d). |
+| [`RecruitmentRiskControllerTest`](../../force-app/main/default/classes/RecruitmentRiskControllerTest.cls) | `RecruitmentRiskController` | Tests `@AuraEnabled` risk triage queries and filtering by severity (HIGH, MEDIUM, LOW). |
+| [`RecruiterActionServiceTest`](../../force-app/main/default/classes/RecruiterActionServiceTest.cls) | `RecruiterActionService` | Validates action dispatch mechanics (`NUDGE_INTERVIEWER`, `SCHEDULE_INTERVIEW`, `SOURCE_CANDIDATES`, `FLAG_STALLED_APPLICATION`). |
+| [`RecruiterActionCenterControllerTest`](../../force-app/main/default/classes/RecruiterActionCenterControllerTest.cls) | `RecruiterActionCenterController` | Validates Action Center UI payload delivery, action execution confirmation, and audit record creation. |
+| [`RecruiterActionCenterActionTest`](../../force-app/main/default/classes/RecruiterActionCenterActionTest.cls) | `RecruiterActionCenterAction` | Tests Agentforce action dispatch interface for operational recruiter workflows. |
+| [`RecruitmentDataFactoryTest`](../../force-app/main/default/classes/RecruitmentDataFactoryTest.cls) | `RecruitmentDataFactory` | Validates basic record provisioning and relationship integrity in test contexts. |
+| [`RecruitmentTestDataFactoryTest`](../../force-app/main/default/classes/RecruitmentTestDataFactoryTest.cls) | `RecruitmentTestDataFactory` | Validates bulk generation of complex end-to-end recruitment scenarios with pre-configured matches and interviews. |
+| [`RecruitmentSecurityTest`](../../force-app/main/default/classes/RecruitmentSecurityTest.cls) | All Production Classes | Dedicated multi-persona RBAC, FLS, and PII masking test suite executing negative and positive permissions tests. |
+| [`RecruitmentIntelligenceTest`](../../force-app/main/default/classes/RecruitmentIntelligenceTest.cls) | Orchestration Classes | Validates cross-service workflows linking matches, risk detection, and action execution. |
 
 ---
 
 ## 3. Specialized Security Test Suite (`RecruitmentSecurityTest`)
 
-The test class [`RecruitmentSecurityTest.cls`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/classes/RecruitmentSecurityTest.cls) isolates security enforcement by provisioning distinct test users for each persona and asserting explicit authorization boundaries:
+The test class [`RecruitmentSecurityTest.cls`](../../force-app/main/default/classes/RecruitmentSecurityTest.cls) isolates security enforcement by provisioning distinct test users for each persona and asserting explicit authorization boundaries:
 
 ```apex
 // Persona 1: Recruitment_Administrator
@@ -161,7 +161,7 @@ Follow this 10-step checklist to verify end-to-end platform readiness in the dem
 - [ ] **Step 2: Inspect Candidate Record**
   Navigate to **Candidates** tab. Open any candidate record (e.g., *Jane Doe*). Verify profile fields and related applications.
 - [ ] **Step 3: Verify Match Intelligence UI**
-  On the candidate page, review the [`candidateJobMatchPanel`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/lwc/candidateJobMatchPanel) component. Confirm the circular match score gauge and explainability breakdown (Skills, Experience, Qualification, Location).
+  On the candidate page, review the [`candidateJobMatchPanel`](../../force-app/main/default/lwc/candidateJobMatchPanel) component. Confirm the circular match score gauge and explainability breakdown (Skills, Experience, Qualification, Location).
 - [ ] **Step 4: Launch Candidate Comparison**
   Navigate to the **Candidate Comparison** tab. Select a job requisition and 3 candidate records. Verify the side-by-side comparative matrix renders with normalized factor scores.
 - [ ] **Step 5: Agentforce Match Inquiry**

@@ -74,7 +74,7 @@ Component Failures [2]
 ```
 
 #### Failure 1: `Settings:Bot`
-- **Component File**: [`force-app/main/default/settings/Bot.settings-meta.xml`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/settings/Bot.settings-meta.xml)
+- **Component File**: [`force-app/main/default/settings/Bot.settings-meta.xml`](../force-app/main/default/settings/Bot.settings-meta.xml)
 - **Problem String**: `Legal Terms acceptance and/or necessary feature dependencies required to enable Bot Settings`
 - **Classification**: **Environment-Specific / Platform Gate**.
 - **Root Cause**: Salesforce requires a tenant administrator to manually navigate to *Setup -> Einstein Bots* and check the legal terms acknowledgment box before the `BotSettings` metadata entity can be updated via the Metadata API.
@@ -84,7 +84,7 @@ Component Failures [2]
   2. Document the manual terms acceptance in Setup as an optional step if legacy bots are ever required.
 
 #### Failure 2: `FlexiPage:Candidate_Record_Page`
-- **Component File**: [`force-app/main/default/flexipages/Candidate_Record_Page.flexipage-meta.xml`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/flexipages/Candidate_Record_Page.flexipage-meta.xml)
+- **Component File**: [`force-app/main/default/flexipages/Candidate_Record_Page.flexipage-meta.xml`](../force-app/main/default/flexipages/Candidate_Record_Page.flexipage-meta.xml)
 - **Problem String**: `We couldn't retrieve the design time component information for component flexipage:detail.`
 - **Classification**: **Metadata Dependency Ordering Issue**.
 - **Root Cause**: The component utilizes `<componentName>flexipage:detail</componentName>` inside a standard record facet. During an atomic all-in-one source push, the Lightning Page compiler attempts to resolve the design-time layout facet before the `Candidate__c-Candidate Layout.layout-meta.xml` profile assignment is finalized in the target runtime.
@@ -234,9 +234,9 @@ A fresh, live test run was executed on `recruitment-dev` (`skafrid246.bd97a9cd1a
 - Working directory: `C:\Users\Shaik Afrid\recruitment-ai`
 - Git initialized: **No** (`fatal: not a git repository`).
 - Existing configuration files:
-  - [`.gitignore`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/.gitignore): Present, covers `.sf/`, `.sfdx/`, `node_modules/`, `coverage/`, `logs/`, `.env`.
-  - [`.forceignore`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/.forceignore): Present, covers `package.xml`, `**/jsconfig.json`, `node_modules/`.
-  - [`sfdx-project.json`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/sfdx-project.json): Source API version 67.0.
+  - [`.gitignore`](../.gitignore): Present, covers `.sf/`, `.sfdx/`, `node_modules/`, `coverage/`, `logs/`, `.env`.
+  - [`.forceignore`](../.forceignore): Present, covers `package.xml`, `**/jsconfig.json`, `node_modules/`.
+  - [`sfdx-project.json`](../sfdx-project.json): Source API version 67.0.
 
 ### 6.2 Security & Credential Audit
 - Scanned for hardcoded client secrets, private keys, passwords, and API tokens: **0 detected**.

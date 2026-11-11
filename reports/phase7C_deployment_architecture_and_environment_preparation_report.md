@@ -15,10 +15,10 @@
 Phase 7C establishes the comprehensive **Deployment Architecture, Environment Preparation, and Portfolio Presentation** for the Salesforce AI Recruitment Hub. As mandated by the governance framework, this phase is strictly non-destructive and non-deploying: zero live deployments were executed, zero org records were modified, and no git remotes were pushed.
 
 Instead, Phase 7C synthesizes the completed development of Phases 1 through 6 and the rigorous verification outcomes of Phases 7A, 7A.1, 7B, and 7B.1 into a deterministic, production-grade deployment framework. Key deliverables achieved in this phase include:
-- A standardized, version-controlled deployment manifest ([`manifest/package.xml`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/manifest/package.xml)) covering all 13 core metadata types (203 tracked components) and explicitly isolating non-portable metadata.
+- A standardized, version-controlled deployment manifest ([`manifest/package.xml`](../manifest/package.xml)) covering all 13 core metadata types (203 tracked components) and explicitly isolating non-portable metadata.
 - A 12-level topological deployment dependency graph resolving all inter-component dependencies.
 - A comprehensive suite of portfolio-ready architecture, security, deployment, and testing specifications in `docs/`.
-- A fully transformed, executive-ready [`README.md`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/README.md) positioned for GitHub portfolio launch.
+- A fully transformed, executive-ready [`README.md`](../README.md) positioned for GitHub portfolio launch.
 - A complete portability analysis addressing Agentforce agent user remapping, Einstein Bots legal prerequisite isolation, dashboard running user limitations, and OWD security progression.
 
 The overall **Deployment Readiness Score is rated at 98/100 (READY FOR PORTFOLIO LAUNCH & TARGET DEPLOYMENT)**.
@@ -141,7 +141,7 @@ pie title Metadata Distribution (204 Total Files)
 - **Error Message**: `You must accept the Einstein Bots Terms of Use before enabling Einstein Bots.`
 - **Root Cause**: `force-app/main/default/settings/Bot.settings-meta.xml` sets `<enableBots>true</enableBots>`. The Salesforce Metadata API prevents enabling Einstein Bots programmatically unless the legal terms have been explicitly accepted via the Salesforce Setup UI.
 - **Remediation**:
-  - Exclude `Settings:Bot` from [`manifest/package.xml`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/manifest/package.xml).
+  - Exclude `Settings:Bot` from [`manifest/package.xml`](../manifest/package.xml).
   - Modern Agentforce agents utilize `aiAuthoringBundles` and do not require legacy Einstein Bot settings.
   - Document manual setup toggle in `DEPLOYMENT_RUNBOOK.md` as an optional step.
 
@@ -220,7 +220,7 @@ flowchart TD
 ## 12. Deployment Manifest Architecture (`manifest/package.xml`)
 
 The manifest is authored using standard Salesforce Metadata API v67.0:
-- File path: [`manifest/package.xml`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/manifest/package.xml)
+- File path: [`manifest/package.xml`](../manifest/package.xml)
 - Included metadata types:
   1. `AiAuthoringBundle` (`AI_Recruitment_Assistant`)
   2. `ApexClass` (All 36 classes)
@@ -297,10 +297,10 @@ All 8 flows in `force-app/main/default/flows/` are configured with `<status>Acti
 
 | Permission Set | Target Persona | CRUD Privileges | Key Security Guardrail |
 | :--- | :--- | :--- | :--- |
-| [`Recruitment_Administrator`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/permissionsets/Recruitment_Administrator.permissionset-meta.xml) | System Administrator | Full CRUD across all 6 objects | Complete operational oversight |
-| [`Recruitment_Recruiter`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/permissionsets/Recruitment_Recruiter.permissionset-meta.xml) | Recruiter / Talent Ops | Read, Create, Edit on core objects | **ZERO DELETE permissions** (Hardened in 7B.1) |
-| [`Recruitment_Hiring_Manager`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/permissionsets/Recruitment_Hiring_Manager.permissionset-meta.xml) | Hiring Manager / Panel | Read-Only on Requisitions/Candidates; Edit Scorecards | **Candidate Phone PII Masked** |
-| [`Recruitment_Agent_User`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/permissionsets/Recruitment_Agent_User.permissionset-meta.xml) | Agentforce Agent | Read-Only on match intelligence & metadata | **ZERO Direct DML** (Invocable actions only) |
+| [`Recruitment_Administrator`](../force-app/main/default/permissionsets/Recruitment_Administrator.permissionset-meta.xml) | System Administrator | Full CRUD across all 6 objects | Complete operational oversight |
+| [`Recruitment_Recruiter`](../force-app/main/default/permissionsets/Recruitment_Recruiter.permissionset-meta.xml) | Recruiter / Talent Ops | Read, Create, Edit on core objects | **ZERO DELETE permissions** (Hardened in 7B.1) |
+| [`Recruitment_Hiring_Manager`](../force-app/main/default/permissionsets/Recruitment_Hiring_Manager.permissionset-meta.xml) | Hiring Manager / Panel | Read-Only on Requisitions/Candidates; Edit Scorecards | **Candidate Phone PII Masked** |
+| [`Recruitment_Agent_User`](../force-app/main/default/permissionsets/Recruitment_Agent_User.permissionset-meta.xml) | Agentforce Agent | Read-Only on match intelligence & metadata | **ZERO Direct DML** (Invocable actions only) |
 
 ---
 
@@ -311,14 +311,14 @@ The test suite was verified in Phase 7B.1 (Test Run ID: `707g800000vZZIV`):
 - **Total Test Methods**: 122
 - **Pass Rate**: 100% (122 passing, 0 failing)
 - **Org-Wide Code Coverage**: 92% across all 21 production Apex classes.
-- **Dedicated Security Suite**: [`RecruitmentSecurityTest.cls`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/force-app/main/default/classes/RecruitmentSecurityTest.cls) verifies multi-persona permissions via `System.runAs()`.
+- **Dedicated Security Suite**: [`RecruitmentSecurityTest.cls`](../force-app/main/default/classes/RecruitmentSecurityTest.cls) verifies multi-persona permissions via `System.runAs()`.
 
 ---
 
 ## 20. Local-Only Validation Results and Syntax Verification
 
 During Phase 7C, local syntax and manifest integrity checks were executed:
-- **XML Parsing Verification**: Executed PowerShell XML DOM parser against [`manifest/package.xml`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/manifest/package.xml). Result: **13 valid metadata types parsed with 0 syntax errors**.
+- **XML Parsing Verification**: Executed PowerShell XML DOM parser against [`manifest/package.xml`](../manifest/package.xml). Result: **13 valid metadata types parsed with 0 syntax errors**.
 - **Static Code Hygiene**: Confirmed zero hardcoded passwords, tokens, or credentials in local repository files.
 - **Strict Constraint Enforcement**: Zero deploy commands executed (`sf project deploy` was NOT run).
 
@@ -330,13 +330,13 @@ The following technical assets were created and structured in `docs/`:
 
 | Document | File Path | Focus & Core Contents |
 | :--- | :--- | :--- |
-| **System Architecture** | [`docs/architecture/SYSTEM_ARCHITECTURE.md`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/docs/architecture/SYSTEM_ARCHITECTURE.md) | 5-tier architecture, ERD, 4-factor scoring algorithm, Agentforce sequence diagram, LWC inventory. |
-| **Deployment Architecture** | [`docs/deployment/DEPLOYMENT_ARCHITECTURE.md`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/docs/deployment/DEPLOYMENT_ARCHITECTURE.md) | Dual-environment strategy, 12-level topological ordering, rollback strategy, environment portability. |
-| **Metadata Inventory** | [`docs/deployment/METADATA_INVENTORY.md`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/docs/deployment/METADATA_INVENTORY.md) | Granular inventory of all 204 metadata files with inclusion/exclusion rationales. |
-| **Deployment Runbook** | [`docs/deployment/DEPLOYMENT_RUNBOOK.md`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/docs/deployment/DEPLOYMENT_RUNBOOK.md) | Step-by-step CLI runbook, deployment sequence diagram, automated test verification, rollback commands. |
-| **Security & Access Model** | [`docs/security/SECURITY_AND_ACCESS_MODEL.md`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/docs/security/SECURITY_AND_ACCESS_MODEL.md) | RBAC class diagram, FLS PII matrix, Apex schema validation, OWD roadmap, compliance logging. |
-| **Testing & Validation** | [`docs/testing/TESTING_AND_VALIDATION.md`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/docs/testing/TESTING_AND_VALIDATION.md) | 15 test classes breakdown, 92% coverage chart, `RecruitmentSecurityTest` code snippet, 10-step manual checklist. |
-| **Portfolio Presentation** | [`README.md`](file:///c:/Users/Shaik%20Afrid/recruitment-ai/README.md) | Executive summary, feature overview, technology badges, UI wireframe mockups, responsible AI principles. |
+| **System Architecture** | [`docs/architecture/SYSTEM_ARCHITECTURE.md`](../docs/architecture/SYSTEM_ARCHITECTURE.md) | 5-tier architecture, ERD, 4-factor scoring algorithm, Agentforce sequence diagram, LWC inventory. |
+| **Deployment Architecture** | [`docs/deployment/DEPLOYMENT_ARCHITECTURE.md`](../docs/deployment/DEPLOYMENT_ARCHITECTURE.md) | Dual-environment strategy, 12-level topological ordering, rollback strategy, environment portability. |
+| **Metadata Inventory** | [`docs/deployment/METADATA_INVENTORY.md`](../docs/deployment/METADATA_INVENTORY.md) | Granular inventory of all 204 metadata files with inclusion/exclusion rationales. |
+| **Deployment Runbook** | [`docs/deployment/DEPLOYMENT_RUNBOOK.md`](../docs/deployment/DEPLOYMENT_RUNBOOK.md) | Step-by-step CLI runbook, deployment sequence diagram, automated test verification, rollback commands. |
+| **Security & Access Model** | [`docs/security/SECURITY_AND_ACCESS_MODEL.md`](../docs/security/SECURITY_AND_ACCESS_MODEL.md) | RBAC class diagram, FLS PII matrix, Apex schema validation, OWD roadmap, compliance logging. |
+| **Testing & Validation** | [`docs/testing/TESTING_AND_VALIDATION.md`](../docs/testing/TESTING_AND_VALIDATION.md) | 15 test classes breakdown, 92% coverage chart, `RecruitmentSecurityTest` code snippet, 10-step manual checklist. |
+| **Portfolio Presentation** | [`README.md`](../README.md) | Executive summary, feature overview, technology badges, UI wireframe mockups, responsible AI principles. |
 
 ---
 
