@@ -169,6 +169,7 @@ public with sharing class CandidateJobMatchService {
         ];
 
         Candidate_Job_Match__c matchRec = evaluateMatch(cand, job);
+        checkMatchUpsertPermission();
         upsert matchRec Match_Key__c;
         return matchRec;
     }
@@ -208,6 +209,7 @@ public with sharing class CandidateJobMatchService {
         sortMatchesDescending(matches);
 
         if (persist == true && !matches.isEmpty()) {
+            checkMatchUpsertPermission();
             upsert matches Match_Key__c;
         }
 
@@ -250,6 +252,7 @@ public with sharing class CandidateJobMatchService {
         sortMatchesDescending(matches);
 
         if (persist == true && !matches.isEmpty()) {
+            checkMatchUpsertPermission();
             upsert matches Match_Key__c;
         }
 
@@ -286,10 +289,17 @@ public with sharing class CandidateJobMatchService {
         sortMatchesDescending(allMatches);
 
         if (persist == true && !allMatches.isEmpty()) {
+            checkMatchUpsertPermission();
             upsert allMatches Match_Key__c;
         }
 
         return allMatches;
+    }
+
+    private static void checkMatchUpsertPermission() {
+        if (!Schema.sObjectType.Candidate_Job_Match__c.isCreateable() || !Schema.sObjectType.Candidate_Job_Match__c.isUpdateable()) {
+            throw new System.NoAccessException();
+        }
     }
 
     // --- Private Matching & Scoring Calculations ---

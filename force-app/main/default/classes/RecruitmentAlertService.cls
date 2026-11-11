@@ -417,6 +417,12 @@ public with sharing class RecruitmentAlertService {
         }
 
         try {
+            if (!Schema.sObjectType.Recruitment_Alert__c.isUpdateable()) {
+                res.isSuccess = false;
+                res.message = 'Insufficient permissions to update recruitment alerts.';
+                return res;
+            }
+
             List<Recruitment_Alert__c> alerts = [
                 SELECT Id, Status__c, Acknowledged_By__c, Acknowledged_Date__c, Acknowledged_Notes__c
                 FROM Recruitment_Alert__c
@@ -470,6 +476,12 @@ public with sharing class RecruitmentAlertService {
         }
 
         try {
+            if (!Schema.sObjectType.Interview__c.isUpdateable()) {
+                res.isSuccess = false;
+                res.message = 'Insufficient permissions to reschedule interviews.';
+                return res;
+            }
+
             List<Interview__c> ivList = [
                 SELECT Id, Name, Interview_Name__c, Interview_Date__c, Interview_Status__c,
                        Interview_Feedback__c, Candidate__c, Job_Application__c

@@ -116,20 +116,20 @@ public with sharing class CandidateComparisonController {
         }
         Job_Requisition__c job = jobs[0];
 
-        // 3. Query Candidate_Job_Match__c Records
-        List<Candidate_Job_Match__c> matches = [
-            SELECT Id, Name, Match_Key__c, Job_Requisition__c,
-                   Candidate__c, Candidate__r.Name, Candidate__r.Candidate_Name__c,
-                   Candidate__r.Email__c, Candidate__r.Phone__c, Candidate__r.Location__c,
-                   Candidate__r.Years_of_Experience__c, Candidate__r.Highest_Qualification__c,
-                   Candidate__r.Skills__c,
-                   Skill_Match_Percent__c, Skill_Gap_Percent__c,
-                   Experience_Match_Percent__c, Qualification_Match_Percent__c, Location_Match_Percent__c,
-                   Overall_Match_Score__c, Matched_Skills__c, Missing_Skills__c,
-                   Explanation__c, Recommendation__c, Evaluation_Status__c, Calculated_On__c
-            FROM Candidate_Job_Match__c
-            WHERE Id IN :matchIds
-        ];
+        // 3. Query Candidate_Job_Match__c Records (with FLS check on Phone__c)
+        Boolean canReadPhone = Schema.sObjectType.Candidate__c.fields.Phone__c.isAccessible();
+        String phoneSelect = canReadPhone ? 'Candidate__r.Phone__c, ' : '';
+        String matchQuery = 'SELECT Id, Name, Match_Key__c, Job_Requisition__c, ' +
+                            'Candidate__c, Candidate__r.Name, Candidate__r.Candidate_Name__c, ' +
+                            'Candidate__r.Email__c, ' + phoneSelect + 'Candidate__r.Location__c, ' +
+                            'Candidate__r.Years_of_Experience__c, Candidate__r.Highest_Qualification__c, ' +
+                            'Candidate__r.Skills__c, ' +
+                            'Skill_Match_Percent__c, Skill_Gap_Percent__c, ' +
+                            'Experience_Match_Percent__c, Qualification_Match_Percent__c, Location_Match_Percent__c, ' +
+                            'Overall_Match_Score__c, Matched_Skills__c, Missing_Skills__c, ' +
+                            'Explanation__c, Recommendation__c, Evaluation_Status__c, Calculated_On__c ' +
+                            'FROM Candidate_Job_Match__c WHERE Id IN :matchIds';
+        List<Candidate_Job_Match__c> matches = Database.query(matchQuery);
 
         if (matches.isEmpty()) {
             throw new AuraHandledException('None of the requested candidate match records were found.');
@@ -262,7 +262,9 @@ public with sharing class CandidateComparisonController {
         item.candidateId = m.Candidate__c;
         item.candidateName = String.isNotBlank(m.Candidate__r.Candidate_Name__c) ? m.Candidate__r.Candidate_Name__c : m.Candidate__r.Name;
         item.candidateEmail = m.Candidate__r.Email__c;
-        item.candidatePhone = m.Candidate__r.Phone__c;
+        item.candidatePhone = Schema.sObjectType.Candidate__c.fields.Phone__c.isAccessible() 
+            ? m.Candidate__r.Phone__c 
+            : '[Protected - Contact Recruiter]';
         item.candidateLocation = m.Candidate__r.Location__c;
         item.candidateExperience = m.Candidate__r.Years_of_Experience__c != null ? m.Candidate__r.Years_of_Experience__c : 0.0;
         item.candidateQualification = m.Candidate__r.Highest_Qualification__c;

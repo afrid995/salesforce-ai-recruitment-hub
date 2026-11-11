@@ -143,23 +143,22 @@ public with sharing class CandidateJobMatchUIController {
             return null;
         }
 
-        List<Candidate_Job_Match__c> matches = [
-            SELECT Id, Name, Match_Key__c,
-                   Candidate__c, Candidate__r.Name, Candidate__r.Candidate_Name__c,
-                   Candidate__r.Email__c, Candidate__r.Phone__c, Candidate__r.Location__c,
-                   Candidate__r.Years_of_Experience__c, Candidate__r.Highest_Qualification__c, Candidate__r.Skills__c,
-                   Job_Requisition__c, Job_Requisition__r.Name, Job_Requisition__r.Job_Title__c,
-                   Job_Requisition__r.Job_Code__c, Job_Requisition__r.Department__c, Job_Requisition__r.Location__c,
-                   Job_Requisition__r.Experience_Required__c, Job_Requisition__r.Minimum_Qualification__c,
-                   Job_Requisition__r.Required_Skills__c,
-                   Skill_Match_Percent__c, Skill_Gap_Percent__c,
-                   Experience_Match_Percent__c, Qualification_Match_Percent__c, Location_Match_Percent__c,
-                   Overall_Match_Score__c, Matched_Skills__c, Missing_Skills__c,
-                   Explanation__c, Recommendation__c, Evaluation_Status__c, Calculated_On__c
-            FROM Candidate_Job_Match__c
-            WHERE Id = :matchId
-            LIMIT 1
-        ];
+        Boolean canReadPhone = Schema.sObjectType.Candidate__c.fields.Phone__c.isAccessible();
+        String phoneSelect = canReadPhone ? 'Candidate__r.Phone__c, ' : '';
+        String matchQuery = 'SELECT Id, Name, Match_Key__c, ' +
+                            'Candidate__c, Candidate__r.Name, Candidate__r.Candidate_Name__c, ' +
+                            'Candidate__r.Email__c, ' + phoneSelect + 'Candidate__r.Location__c, ' +
+                            'Candidate__r.Years_of_Experience__c, Candidate__r.Highest_Qualification__c, Candidate__r.Skills__c, ' +
+                            'Job_Requisition__c, Job_Requisition__r.Name, Job_Requisition__r.Job_Title__c, ' +
+                            'Job_Requisition__r.Job_Code__c, Job_Requisition__r.Department__c, Job_Requisition__r.Location__c, ' +
+                            'Job_Requisition__r.Experience_Required__c, Job_Requisition__r.Minimum_Qualification__c, ' +
+                            'Job_Requisition__r.Required_Skills__c, ' +
+                            'Skill_Match_Percent__c, Skill_Gap_Percent__c, ' +
+                            'Experience_Match_Percent__c, Qualification_Match_Percent__c, Location_Match_Percent__c, ' +
+                            'Overall_Match_Score__c, Matched_Skills__c, Missing_Skills__c, ' +
+                            'Explanation__c, Recommendation__c, Evaluation_Status__c, Calculated_On__c ' +
+                            'FROM Candidate_Job_Match__c WHERE Id = :matchId LIMIT 1';
+        List<Candidate_Job_Match__c> matches = Database.query(matchQuery);
 
         if (matches.isEmpty()) {
             return null;
@@ -333,7 +332,9 @@ public with sharing class CandidateJobMatchUIController {
         dto.candidateId = m.Candidate__c;
         dto.candidateName = String.isNotBlank(m.Candidate__r.Candidate_Name__c) ? m.Candidate__r.Candidate_Name__c : m.Candidate__r.Name;
         dto.candidateEmail = m.Candidate__r.Email__c;
-        dto.candidatePhone = m.Candidate__r.Phone__c;
+        dto.candidatePhone = Schema.sObjectType.Candidate__c.fields.Phone__c.isAccessible() 
+            ? m.Candidate__r.Phone__c 
+            : '[Protected - Contact Recruiter]';
         dto.candidateLocation = m.Candidate__r.Location__c;
         dto.candidateExperience = m.Candidate__r.Years_of_Experience__c;
         dto.candidateQualification = m.Candidate__r.Highest_Qualification__c;
