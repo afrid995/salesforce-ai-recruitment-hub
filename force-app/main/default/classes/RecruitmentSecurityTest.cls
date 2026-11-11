@@ -124,6 +124,16 @@ private class RecruitmentSecurityTest {
             // Recruiter can acknowledge alerts
             RecruitmentAlertService.ActionCenterResult ackRes = RecruitmentAlertController.acknowledgeAlert(alertRec.Id, 'Reviewed by recruiter');
             System.assertEquals(true, ackRes.isSuccess, 'Recruiter should be able to acknowledge alerts');
+
+            // Phase 7B.1 Hardening: Recruiter has NO delete permissions on recruiting entities
+            System.assertEquals(false, Schema.sObjectType.Candidate__c.isDeletable(),
+                'Recruiter must NOT have delete permission on Candidate__c');
+            System.assertEquals(false, Schema.sObjectType.Job_Requisition__c.isDeletable(),
+                'Recruiter must NOT have delete permission on Job_Requisition__c');
+            System.assertEquals(false, Schema.sObjectType.Job_Application__c.isDeletable(),
+                'Recruiter must NOT have delete permission on Job_Application__c');
+            System.assertEquals(false, Schema.sObjectType.Interview__c.isDeletable(),
+                'Recruiter must NOT have delete permission on Interview__c');
         }
     }
 
@@ -167,7 +177,20 @@ private class RecruitmentSecurityTest {
             System.assertEquals(false, Schema.sObjectType.Job_Application__c.isDeletable(),
                 'Agent user must NOT have delete permission on Job_Application__c');
 
-            // Agent user can execute Invocable search and match actions
+            // Agent user has NO access to candidate phone PII
+            System.assertEquals(false, Schema.sObjectType.Candidate__c.fields.Phone__c.isAccessible(),
+                'Agent user must NOT have read access to Candidate Phone PII');
+
+            // Agent user can execute Invocable search and match actions with masked phone PII
+            RecruitmentSearchCandidatesAction.Request candReq = new RecruitmentSearchCandidatesAction.Request();
+            candReq.candidateName = 'Samantha';
+            List<RecruitmentSearchCandidatesAction.Response> candRes = RecruitmentSearchCandidatesAction.searchCandidates(
+                new List<RecruitmentSearchCandidatesAction.Request>{ candReq }
+            );
+            System.assertEquals(1, candRes.size(), 'Agent should execute search candidates action');
+            System.assert(candRes[0].result.contains('[Protected - Recruiter Access Only]'),
+                'Candidate phone number must be masked when returned to Agentforce');
+
             RecruitmentSearchJobsAction.Request jobReq = new RecruitmentSearchJobsAction.Request();
             jobReq.searchTerm = 'Security';
             List<RecruitmentSearchJobsAction.Response> jobRes = RecruitmentSearchJobsAction.searchJobs(
@@ -175,6 +198,21 @@ private class RecruitmentSecurityTest {
             );
             System.assertEquals(1, jobRes.size(), 'Agent should execute search jobs action');
             System.assert(jobRes[0].result.contains('Security Lead Engineer'), 'Result should return matching job');
+        }
+    }
+
+    @isTest
+    static void testAdminPreservedPermissions() {
+        User adminUser = createRoleUser('admusr', 'Recruitment_Admin');
+        System.runAs(adminUser) {
+            System.assertEquals(true, Schema.sObjectType.Job_Requisition__c.isDeletable(),
+                'Admin must retain delete permission on Job_Requisition__c');
+            System.assertEquals(true, Schema.sObjectType.Candidate__c.isDeletable(),
+                'Admin must retain delete permission on Candidate__c');
+            System.assertEquals(true, Schema.sObjectType.Job_Application__c.isDeletable(),
+                'Admin must retain delete permission on Job_Application__c');
+            System.assertEquals(true, Schema.sObjectType.Interview__c.isDeletable(),
+                'Admin must retain delete permission on Interview__c');
         }
     }
 

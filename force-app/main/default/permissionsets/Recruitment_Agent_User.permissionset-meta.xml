@@ -82,11 +82,6 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
-    <field>Candidate__c.Phone__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>true</editable>
     <field>Candidate__c.Resume_Link__c</field>
     <readable>true</readable>
   </fieldPermissions>

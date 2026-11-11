@@ -31,12 +31,13 @@ public with sharing class RecruitmentSearchCandidatesAction {
             Decimal minExp = req != null ? req.minExperience : null;
             String statusQuery = req != null && String.isNotBlank(req.status) ? req.status.trim().toLowerCase() : null;
 
-            List<Candidate__c> allCandidates = [
-                SELECT Id, Candidate_Name__c, Email__c, Phone__c, Location__c, Highest_Qualification__c,
-                       University__c, Graduation_Year__c, Years_of_Experience__c, Skills__c, Candidate_Status__c
-                FROM Candidate__c
-                ORDER BY Candidate_Name__c ASC
-            ];
+            Boolean canReadPhone = Schema.sObjectType.Candidate__c.fields.Phone__c.isAccessible();
+            String phoneSelect = canReadPhone ? 'Phone__c, ' : '';
+            String candQuery = 'SELECT Id, Candidate_Name__c, Email__c, ' + phoneSelect +
+                               'Location__c, Highest_Qualification__c, University__c, Graduation_Year__c, ' +
+                               'Years_of_Experience__c, Skills__c, Candidate_Status__c ' +
+                               'FROM Candidate__c ORDER BY Candidate_Name__c ASC';
+            List<Candidate__c> allCandidates = Database.query(candQuery);
 
             List<Candidate__c> matched = new List<Candidate__c>();
             for (Candidate__c c : allCandidates) {
@@ -126,7 +127,8 @@ public with sharing class RecruitmentSearchCandidatesAction {
                 Integer i = 1;
                 for (Candidate__c c : matched) {
                     lines.add(i + '. **' + c.Candidate_Name__c + '**');
-                    lines.add('   - Email: ' + c.Email__c + ' | Phone: ' + (c.Phone__c != null ? c.Phone__c : 'N/A') + ' | Location: ' + (c.Location__c != null ? c.Location__c : 'N/A'));
+                    String phoneDisplay = canReadPhone ? (c.Phone__c != null ? c.Phone__c : 'N/A') : '[Protected - Recruiter Access Only]';
+                    lines.add('   - Email: ' + c.Email__c + ' | Phone: ' + phoneDisplay + ' | Location: ' + (c.Location__c != null ? c.Location__c : 'N/A'));
                     lines.add('   - Experience: ' + (c.Years_of_Experience__c != null ? String.valueOf(c.Years_of_Experience__c) : '0') + ' yrs | Status: ' + c.Candidate_Status__c);
                     lines.add('   - Education: ' + (c.Highest_Qualification__c != null ? c.Highest_Qualification__c : 'N/A') + ' (' + (c.University__c != null ? c.University__c : 'N/A') + ')');
                     if (String.isNotBlank(c.Skills__c)) {
