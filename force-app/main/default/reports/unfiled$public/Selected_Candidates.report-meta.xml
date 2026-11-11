@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <columns>
+        <field>CUST_NAME</field>
+    </columns>
+    <columns>
+        <field>Candidate__c.Candidate_Name__c</field>
+    </columns>
+    <columns>
+        <field>Candidate__c.Email__c</field>
+    </columns>
+    <columns>
+        <field>Candidate__c.Phone__c</field>
+    </columns>
+    <columns>
+        <field>Candidate__c.Location__c</field>
+    </columns>
+    <columns>
+        <field>Candidate__c.Highest_Qualification__c</field>
+    </columns>
+    <columns>
+        <field>Candidate__c.Years_of_Experience__c</field>
+    </columns>
+    <description>Candidates who have been successfully selected in the hiring process.</description>
+    <filter>
+        <criteriaItems>
+            <column>Candidate__c.Candidate_Status__c</column>
+            <isUnlocked>true</isUnlocked>
+            <operator>equals</operator>
+            <value>Selected</value>
+        </criteriaItems>
+    </filter>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>Candidate__c.Candidate_Status__c</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>Selected Candidates</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>CustomEntity$Candidate__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <showGrandTotal>true</showGrandTotal>
+    <showSubTotals>true</showSubTotals>
+    <timeFrameFilter>
+        <dateColumn>CUST_CREATED_DATE</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
+</Report>

@@ -1,0 +1,236 @@
+.assistant-container {
+    max-width: 1440px;
+    margin: 0 auto;
+}
+
+.assistant-header {
+    background: linear-gradient(135deg, #112233 0%, #1A365D 50%, #0B5CAB 100%);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(17, 34, 51, 0.2);
+}
+
+.bot-icon-wrapper {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    padding: 6px;
+    display: inline-block;
+}
+
+.assistant-tag {
+    color: #93C5FD;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+.assistant-desc {
+    color: #E2E8F0;
+    font-size: 0.9rem;
+}
+
+/* Chat Card Styling */
+.chat-card {
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+    border: 1px solid #E2E8F0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    height: 640px;
+}
+
+.chat-header {
+    background: #F8FAFC;
+    border-bottom: 1px solid #E2E8F0;
+}
+
+.chat-messages {
+    flex-grow: 1;
+    overflow-y: auto;
+    background: #F1F5F9;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-row {
+    display: flex;
+    align-items: flex-start;
+}
+
+.chat-row_user {
+    justify-content: flex-end;
+}
+
+.chat-row_agent {
+    justify-content: flex-start;
+}
+
+.chat-avatar {
+    flex-shrink: 0;
+    margin-top: 4px;
+}
+
+.chat-bubble {
+    max-width: 82%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.chat-bubble_user {
+    background: #0B5CAB;
+    color: #FFFFFF;
+    border-bottom-right-radius: 2px;
+}
+
+.chat-bubble_user .chat-sender {
+    color: #BFDBFE;
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+.chat-bubble_user .chat-time {
+    color: #93C5FD;
+    font-size: 0.7rem;
+}
+
+.chat-bubble_agent {
+    background: #FFFFFF;
+    color: #1E293B;
+    border: 1px solid #E2E8F0;
+    border-bottom-left-radius: 2px;
+}
+
+.chat-bubble_agent .chat-sender {
+    color: #0B5CAB;
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+.chat-bubble_agent .chat-time {
+    color: #64748B;
+    font-size: 0.7rem;
+}
+
+.formatted-agent-text {
+    white-space: pre-wrap;
+    line-height: 1.5;
+    font-size: 0.92rem;
+}
+
+/* Typing Indicator Animation */
+.typing-indicator span {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-right: 3px;
+    background-color: #0B5CAB;
+    border-radius: 50%;
+    animation: typing 1.4s infinite ease-in-out both;
+}
+
+.typing-indicator span:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.typing-indicator span:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes typing {
+    0%, 80%, 100% {
+        transform: scale(0);
+    }
+    40% {
+        transform: scale(1);
+    }
+}
+
+/* Chat Footer & Inputs */
+.chat-footer {
+    background: #FFFFFF;
+    border-top: 1px solid #E2E8F0;
+}
+
+.chat-input {
+    height: 38px;
+    font-size: 0.92rem;
+    border-radius: 4px;
+}
+
+.quick-chips-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+}
+
+.quick-label {
+    font-size: 0.72rem;
+    color: #64748B;
+}
+
+.quick-chip {
+    background: #EFF6FF;
+    color: #1E40AF;
+    border: 1px solid #BFDBFE;
+    border-radius: 16px;
+    padding: 3px 10px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+}
+
+.quick-chip:hover {
+    background: #DBEAFE;
+    border-color: #93C5FD;
+}
+
+/* Right Tabs & Prompts Area */
+.prompts-scroll-area {
+    max-height: 480px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.prompt-card {
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    border-radius: 6px;
+    transition: all 0.2s ease-in-out;
+}
+
+.prompt-card:hover {
+    border-color: #0B5CAB;
+    box-shadow: 0 4px 10px rgba(11, 92, 171, 0.12);
+}
+
+.prompt-title {
+    color: #1E293B;
+}
+
+.prompt-quote {
+    color: #0B5CAB;
+    font-weight: 600;
+    font-size: 0.88rem;
+    margin-top: 4px;
+}
+
+.prompt-expected {
+    font-size: 0.78rem;
+    color: #475569;
+}
+
+.subagents-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.subagent-item, .status-box {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 6px;
+}
+
+.h-100 {
+    height: 100%;
+}

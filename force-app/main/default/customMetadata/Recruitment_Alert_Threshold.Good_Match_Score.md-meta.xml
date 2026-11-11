@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Good Match Score Threshold</label>
+    <protected>false</protected>
+    <values>
+        <field>Alert_Key__c</field>
+        <value xsi:type="xsd:string">GOOD_MATCH_SCORE</value>
+    </values>
+    <values>
+        <field>Enabled__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Severity__c</field>
+        <value xsi:type="xsd:string">High Attention</value>
+    </values>
+    <values>
+        <field>Threshold_Value__c</field>
+        <value xsi:type="xsd:double">65.0</value>
+    </values>
+    <values>
+        <field>Description__c</field>
+        <value xsi:type="xsd:string">Minimum score percent for candidate to be considered a Good Match (default: 65%)</value>
+    </values>
+</CustomMetadata>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>67.0</apiVersion>
+    <assignments>
+        <name>Set_Default_Status</name>
+        <label>Set Default Status</label>
+        <locationX>50</locationX>
+        <locationY>395</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Application_Status__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Applied</stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Check_Application_Date</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Set_Default_Date</name>
+        <label>Set Default Date</label>
+        <locationX>50</locationX>
+        <locationY>695</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Application_Date__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Flow.CurrentDate</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <decisions>
+        <name>Check_Application_Status</name>
+        <label>Check Application Status</label>
+        <locationX>182</locationX>
+        <locationY>287</locationY>
+        <defaultConnector>
+            <targetReference>Check_Application_Date</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Status Already Set</defaultConnectorLabel>
+        <rules>
+            <name>Status_Is_Blank</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Application_Status__c</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Set_Default_Status</targetReference>
+            </connector>
+            <label>Status Is Blank</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Check_Application_Date</name>
+        <label>Check Application Date</label>
+        <locationX>182</locationX>
+        <locationY>587</locationY>
+        <defaultConnectorLabel>Date Already Set</defaultConnectorLabel>
+        <rules>
+            <name>Date_Is_Blank</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Application_Date__c</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Set_Default_Date</targetReference>
+            </connector>
+            <label>Date Is Blank</label>
+        </rules>
+    </decisions>
+    <description>Sets default status (Applied) and application date if blank on record creation.</description>
+    <environments>Default</environments>
+    <interviewLabel>New Job Application {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>New Job Application</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>56</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Check_Application_Status</targetReference>
+        </connector>
+        <object>Job_Application__c</object>
+        <recordTriggerType>Create</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

@@ -1,0 +1,544 @@
+<template>
+    <div class="match-intelligence-container slds-card slds-p-around_medium">
+        <!-- Top Application Bar: Header, Job Selector & Actions -->
+        <div class="slds-page-header slds-page-header_record-home slds-m-bottom_medium header-container">
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-title">
+                    <div class="slds-media slds-media_center">
+                        <div class="slds-media__figure">
+                            <span class="slds-icon_container slds-icon-standard-coaching header-icon">
+                                <lightning-icon icon-name="standard:coaching" size="medium" alternative-text="Match Intelligence"></lightning-icon>
+                            </span>
+                        </div>
+                        <div class="slds-media__body">
+                            <div class="slds-page-header__name">
+                                <div class="slds-page-header__name-title">
+                                    <h1>
+                                        <span class="slds-text-title_bold slds-text-color_weak slds-text-transform_uppercase tracking-wide">
+                                            Decision-Support Platform
+                                        </span>
+                                        <span class="slds-page-header__title slds-truncate main-title" title="Match Intelligence">
+                                            Match Intelligence
+                                        </span>
+                                    </h1>
+                                </div>
+                            </div>
+                            <p class="slds-page-header__name-meta slds-text-body_small">
+                                Explainable Candidate–Job Compatibility Engine • Powered by CandidateJobMatchService
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Global Controls: Job Selector & Actions -->
+                <div class="slds-page-header__col-actions">
+                    <div class="slds-page-header__control header-controls">
+                        <lightning-combobox
+                            name="jobSelector"
+                            label="Job Requisition"
+                            variant="label-hidden"
+                            value={selectedJobId}
+                            placeholder="Select Job Requisition"
+                            options={jobOptions}
+                            onchange={handleJobChange}
+                            class="job-combobox">
+                        </lightning-combobox>
+
+                        <lightning-button-group class="slds-m-left_small">
+                            <lightning-button
+                                label="Recalculate All"
+                                icon-name="utility:refresh"
+                                onclick={handleRecalculateJob}
+                                title="Re-evaluate all candidates for this job requisition">
+                            </lightning-button>
+                            <lightning-button-icon
+                                icon-name={viewModeIcon}
+                                alternative-text="Toggle View"
+                                onclick={handleToggleViewMode}
+                                title={viewModeTitle}>
+                            </lightning-button-icon>
+                        </lightning-button-group>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Spinner -->
+        <template if:true={isLoading}>
+            <div class="spinner-container">
+                <lightning-spinner alternative-text="Calculating Match Intelligence..." size="medium"></lightning-spinner>
+            </div>
+        </template>
+
+        <!-- Main Layout -->
+        <template if:false={isLoading}>
+            
+            <!-- Comparison Mode View -->
+            <template if:true={isComparisonMode}>
+                <c-candidate-comparison-panel
+                    job-id={selectedJobId}
+                    match-ids={selectedCompareMatchIds}
+                    onback={handleCloseComparison}>
+                </c-candidate-comparison-panel>
+            </template>
+
+            <!-- Standard Match Intelligence View (Candidate Pool + Single Match Detail) -->
+            <template if:false={isComparisonMode}>
+                <div class="slds-grid slds-gutters slds-wrap main-grid">
+                    
+                    <!-- Left / Top Column: Job-Level Match View (Ranked Candidate Pool) -->
+                    <div class={listColumnClass}>
+                        <div class="slds-card slds-card_boundary slds-p-around_small list-card">
+                            <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_small">
+                                <div class="slds-col">
+                                    <h2 class="slds-text-heading_small slds-font-weight_bold">
+                                        Candidate Pool ({rankedCandidatesCount})
+                                    </h2>
+                                    <p class="slds-text-body_small slds-text-color_weak">
+                                        {selectedJobTitle} • Ranked by Match Score
+                                    </p>
+                                </div>
+                                <div class="slds-col_bump-left">
+                                    <span class="slds-badge slds-badge_lightest">{selectedJobCode}</span>
+                                </div>
+                            </div>
+
+                            <!-- Compare Action Bar -->
+                            <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_x-small comp-action-bar slds-p-around_xx-small">
+                                <span class="slds-badge slds-badge_lightest select-counter">{selectedCompareCount} of 5 selected</span>
+                                <lightning-button
+                                    label={compareButtonLabel}
+                                    icon-name="utility:metrics"
+                                    variant="brand"
+                                    size="small"
+                                    disabled={isCompareDisabled}
+                                    onclick={handleOpenComparison}
+                                    class="slds-m-left_auto"
+                                    title="Compare 2 to 5 selected candidates side-by-side">
+                                </lightning-button>
+                            </div>
+
+                            <!-- Candidate Table / List -->
+                            <div class="table-scroll-container">
+                                <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered candidate-table">
+                                    <thead>
+                                        <tr class="slds-line-height_reset">
+                                            <th scope="col" class="select-col">
+                                                <span class="slds-assistive-text">Select</span>
+                                            </th>
+                                            <th scope="col" class="rank-col">#</th>
+                                            <th scope="col">Candidate</th>
+                                            <th scope="col" class="score-col">Match</th>
+                                            <th scope="col">Classification</th>
+                                            <th scope="col" class="action-col">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template for:each={rankedCandidates} for:item="cand">
+                                            <tr key={cand.matchId} class={cand.rowClass} onclick={handleSelectCandidateRow} data-match-id={cand.matchId}>
+                                                <td class="select-col" onclick={handleStopPropagation}>
+                                                    <lightning-input
+                                                        type="checkbox"
+                                                        variant="label-hidden"
+                                                        checked={cand.isCompareSelected}
+                                                        onchange={handleCandidateCheckbox}
+                                                        data-match-id={cand.matchId}
+                                                        label="Select Candidate">
+                                                    </lightning-input>
+                                                </td>
+                                                <td class="rank-col">
+                                                    <span class="rank-badge">#{cand.rank}</span>
+                                                </td>
+                                                <td>
+                                                    <div class="slds-truncate font-semibold" title={cand.candidateName}>
+                                                        <a href="javascript:void(0);" onclick={handleNavigateCandidate} data-id={cand.candidateId}>
+                                                            {cand.candidateName}
+                                                        </a>
+                                                    </div>
+                                                    <div class="slds-text-body_extra-small slds-text-color_weak">
+                                                        {cand.candidateExperience} yrs • {cand.candidateLocation}
+                                                    </div>
+                                                </td>
+                                                <td class="score-col">
+                                                    <span class={cand.scoreClass}>{cand.overallScoreFormatted}%</span>
+                                                </td>
+                                                <td>
+                                                    <span class={cand.badgeClass}>{cand.recommendation}</span>
+                                                </td>
+                                                <td class="action-col">
+                                                    <lightning-button-icon
+                                                        icon-name="utility:preview"
+                                                        variant="border-filled"
+                                                        size="small"
+                                                        alternative-text="Inspect Match"
+                                                        title="Inspect Match"
+                                                        onclick={handleSelectCandidate}
+                                                        data-match-id={cand.matchId}>
+                                                    </lightning-button-icon>
+                                                </td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                <!-- Right / Main Column: Explainable Match Intelligence Panel -->
+                <div class={detailColumnClass}>
+                    <template if:true={hasMatchDetail}>
+                        
+                        <!-- 1. TOP SECTION: Match Header & Overview -->
+                        <div class="match-hero-card slds-m-bottom_medium">
+                            <div class="slds-grid slds-wrap slds-grid_vertical-align-center">
+                                
+                                <!-- Left Summary Details -->
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_7-of-12 slds-p-around_medium">
+                                    <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_x-small">
+                                        <span class="slds-badge slds-theme_inverse slds-m-right_x-small">MATCH INTELLIGENCE</span>
+                                        <span class={detailBadgeClass}>{matchDetail.recommendation}</span>
+                                        <span class="slds-m-left_auto slds-text-body_extra-small slds-text-color_weak">
+                                            Calculated: {matchDetail.calculatedOnFormatted}
+                                        </span>
+                                    </div>
+                                    
+                                    <h2 class="hero-candidate-name">
+                                        <a href="javascript:void(0);" onclick={handleNavigateCandidate} data-id={matchDetail.candidateId}>
+                                            {matchDetail.candidateName}
+                                        </a>
+                                    </h2>
+                                    
+                                    <div class="hero-meta-row slds-text-body_regular">
+                                        <span class="meta-label">Evaluating for:</span>
+                                        <a href="javascript:void(0);" onclick={handleNavigateJob} data-id={matchDetail.jobId} class="meta-job-link">
+                                            {matchDetail.jobTitle} ({matchDetail.jobCode})
+                                        </a>
+                                    </div>
+                                    
+                                    <div class="hero-submeta slds-text-body_small slds-m-top_x-small">
+                                        <span>📍 {matchDetail.candidateLocation}</span>
+                                        <span class="bullet-sep">•</span>
+                                        <span>💼 {matchDetail.candidateExperience} yrs exp (Req: {matchDetail.jobExperienceRequired} yrs)</span>
+                                        <span class="bullet-sep">•</span>
+                                        <span>🎓 {matchDetail.candidateQualification}</span>
+                                    </div>
+                                </div>
+
+                                <!-- Right Prominent Score Callout (Requirement 3: Visual Score Presentation) -->
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_5-of-12 score-callout-col slds-p-around_medium">
+                                    <div class="score-card">
+                                        <div class="score-label">CANDIDATE–JOB MATCH SCORE</div>
+                                        <div class="score-number-row">
+                                            <span class="score-number">{matchDetail.overallScore}%</span>
+                                        </div>
+                                        <div class="score-classification">
+                                            <span class={scoreBadgeStyle}>{matchDetail.recommendation}</span>
+                                        </div>
+                                        <div class="score-guardrail-subtext">
+                                            Algorithmic Decision-Support • Human-in-the-Loop
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. SCORE BREAKDOWN: 4 Factor Progress Bars & Weighted Contributions -->
+                        <div class="slds-card slds-card_boundary slds-m-bottom_medium slds-p-around_medium factor-breakdown-card">
+                            <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_small">
+                                <div class="slds-col">
+                                    <h3 class="slds-text-heading_small slds-font-weight_bold">
+                                        Factor Score Breakdown
+                                    </h3>
+                                    <p class="slds-text-body_small slds-text-color_weak">
+                                        Configured Weights: Skill ({weights.skillWeight}%) • Experience ({weights.experienceWeight}%) • Qualification ({weights.qualificationWeight}%) • Location ({weights.locationWeight}%)
+                                    </p>
+                                </div>
+                                <div class="slds-col_bump-left">
+                                    <lightning-button
+                                        label={explainButtonLabel}
+                                        icon-name={explainButtonIcon}
+                                        variant="neutral"
+                                        size="small"
+                                        onclick={handleToggleExplainScore}>
+                                    </lightning-button>
+                                </div>
+                            </div>
+
+                            <!-- Factor Grid -->
+                            <div class="slds-grid slds-gutters slds-wrap factor-grid">
+                                
+                                <!-- Skill Match -->
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_3-of-12 slds-m-bottom_small">
+                                    <div class="factor-box">
+                                        <div class="factor-header">
+                                            <span class="factor-name">Skill Match</span>
+                                            <span class="factor-score">{matchDetail.skillScore}%</span>
+                                        </div>
+                                        <div class="slds-progress-bar slds-progress-bar_small slds-m-vertical_x-small" aria-valuemin="0" aria-valuemax="100" aria-valuenow={matchDetail.skillScore} role="progressbar">
+                                            <span class="slds-progress-bar__value bar-skill" style={skillBarStyle}></span>
+                                        </div>
+                                        <div class="factor-footer">
+                                            <span>Weight: {matchDetail.skillWeight}%</span>
+                                            <span class="contribution-text">Contr: {matchDetail.skillContribution}%</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Experience Match -->
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_3-of-12 slds-m-bottom_small">
+                                    <div class="factor-box">
+                                        <div class="factor-header">
+                                            <span class="factor-name">Experience Match</span>
+                                            <span class="factor-score">{matchDetail.experienceScore}%</span>
+                                        </div>
+                                        <div class="slds-progress-bar slds-progress-bar_small slds-m-vertical_x-small" aria-valuemin="0" aria-valuemax="100" aria-valuenow={matchDetail.experienceScore} role="progressbar">
+                                            <span class="slds-progress-bar__value bar-exp" style={expBarStyle}></span>
+                                        </div>
+                                        <div class="factor-footer">
+                                            <span>Weight: {matchDetail.experienceWeight}%</span>
+                                            <span class="contribution-text">Contr: {matchDetail.experienceContribution}%</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Qualification Match -->
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_3-of-12 slds-m-bottom_small">
+                                    <div class="factor-box">
+                                        <div class="factor-header">
+                                            <span class="factor-name">Qualification Match</span>
+                                            <span class="factor-score">{matchDetail.qualificationScore}%</span>
+                                        </div>
+                                        <div class="slds-progress-bar slds-progress-bar_small slds-m-vertical_x-small" aria-valuemin="0" aria-valuemax="100" aria-valuenow={matchDetail.qualificationScore} role="progressbar">
+                                            <span class="slds-progress-bar__value bar-qual" style={qualBarStyle}></span>
+                                        </div>
+                                        <div class="factor-footer">
+                                            <span>Weight: {matchDetail.qualificationWeight}%</span>
+                                            <span class="contribution-text">Contr: {matchDetail.qualificationContribution}%</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Location Compatibility -->
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-large-size_3-of-12 slds-m-bottom_small">
+                                    <div class="factor-box">
+                                        <div class="factor-header">
+                                            <span class="factor-name">Location Match</span>
+                                            <span class="factor-score">{matchDetail.locationScore}%</span>
+                                        </div>
+                                        <div class="slds-progress-bar slds-progress-bar_small slds-m-vertical_x-small" aria-valuemin="0" aria-valuemax="100" aria-valuenow={matchDetail.locationScore} role="progressbar">
+                                            <span class="slds-progress-bar__value bar-loc" style={locBarStyle}></span>
+                                        </div>
+                                        <div class="factor-footer">
+                                            <span>Weight: {matchDetail.locationWeight}%</span>
+                                            <span class="contribution-text">Contr: {matchDetail.locationContribution}%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 8. EXPLAIN SCORE ACTION (Expandable Transparent Formula Section) -->
+                            <template if:true={isExplainOpen}>
+                                <div class="slds-box slds-theme_shade slds-m-top_small formula-box">
+                                    <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_x-small">
+                                        <lightning-icon icon-name="utility:formula" size="x-small" class="slds-m-right_x-small"></lightning-icon>
+                                        <span class="slds-text-heading_label font-bold">Mathematical Contribution Formula</span>
+                                    </div>
+                                    <div class="formula-table-container">
+                                        <table class="slds-table slds-table_compact slds-table_bordered">
+                                            <thead>
+                                                <tr class="slds-line-height_reset">
+                                                    <th>Evaluation Factor</th>
+                                                    <th>Raw Factor Score</th>
+                                                    <th>Configured Weight</th>
+                                                    <th>Calculation Formula</th>
+                                                    <th>Weighted Contribution</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td class="font-semibold">Skill Match</td>
+                                                    <td>{matchDetail.skillScore}%</td>
+                                                    <td>{matchDetail.skillWeight}%</td>
+                                                    <td>{matchDetail.skillScore}% × {matchDetail.skillWeight}%</td>
+                                                    <td class="font-bold">{matchDetail.skillContribution}%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="font-semibold">Experience Match</td>
+                                                    <td>{matchDetail.experienceScore}%</td>
+                                                    <td>{matchDetail.experienceWeight}%</td>
+                                                    <td>{matchDetail.experienceScore}% × {matchDetail.experienceWeight}%</td>
+                                                    <td class="font-bold">{matchDetail.experienceContribution}%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="font-semibold">Qualification Match</td>
+                                                    <td>{matchDetail.qualificationScore}%</td>
+                                                    <td>{matchDetail.qualificationWeight}%</td>
+                                                    <td>{matchDetail.qualificationScore}% × {matchDetail.qualificationWeight}%</td>
+                                                    <td class="font-bold">{matchDetail.qualificationContribution}%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="font-semibold">Location Compatibility</td>
+                                                    <td>{matchDetail.locationScore}%</td>
+                                                    <td>{matchDetail.locationWeight}%</td>
+                                                    <td>{matchDetail.locationScore}% × {matchDetail.locationWeight}%</td>
+                                                    <td class="font-bold">{matchDetail.locationContribution}%</td>
+                                                </tr>
+                                                <tr class="total-row">
+                                                    <td colspan="4" class="text-right font-bold">Overall Match Score (Sum):</td>
+                                                    <td class="font-bold overall-total">{matchDetail.overallScore}%</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <p class="slds-text-body_extra-small slds-text-color_weak slds-m-top_x-small">
+                                        Configured via Custom Metadata: <code>Match_Weight_Configuration__mdt (Default_Weight)</code>. Evaluated by <code>CandidateJobMatchService</code>.
+                                    </p>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- 4 & 5. SKILLS EVALUATION: MATCHED SKILLS & SKILL GAPS -->
+                        <div class="slds-grid slds-gutters slds-wrap slds-m-bottom_medium">
+                            
+                            <!-- 4. MATCHED SKILLS -->
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-m-bottom_small">
+                                <div class="slds-card slds-card_boundary slds-p-around_medium skill-card card-matched">
+                                    <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_small">
+                                        <div class="slds-media__figure">
+                                            <span class="skill-icon-container icon-success">
+                                                <lightning-icon icon-name="utility:check" size="x-small" variant="inverse"></lightning-icon>
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <h4 class="slds-text-title_bold text-success">MATCHED SKILLS</h4>
+                                            <p class="slds-text-body_extra-small slds-text-color_weak">
+                                                Verified candidate skills matching role requirements ({matchedSkillsCount})
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Visual Skill Badges -->
+                                    <div class="skill-chips-container">
+                                        <template for:each={matchDetail.matchedSkillsList} for:item="skill">
+                                            <span key={skill} class="skill-chip chip-matched">
+                                                <span class="chip-check">✓</span>
+                                                <span class="chip-text">{skill}</span>
+                                            </span>
+                                        </template>
+                                        <template if:false={hasMatchedSkills}>
+                                            <p class="slds-text-body_small slds-text-color_weak slds-p-around_x-small">
+                                                No direct matching skills identified in candidate profile.
+                                            </p>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 5. SKILL GAPS -->
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-m-bottom_small">
+                                <div class="slds-card slds-card_boundary slds-p-around_medium skill-card card-missing">
+                                    <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_small">
+                                        <div class="slds-media__figure">
+                                            <span class="skill-icon-container icon-warning">
+                                                <lightning-icon icon-name="utility:warning" size="x-small" variant="inverse"></lightning-icon>
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <h4 class="slds-text-title_bold text-warning">SKILL GAPS</h4>
+                                            <p class="slds-text-body_extra-small slds-text-color_weak font-semibold">
+                                                Skills not identified in the candidate profile ({missingSkillsCount})
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Visual Skill Gaps Chips -->
+                                    <div class="skill-chips-container">
+                                        <template for:each={matchDetail.missingSkillsList} for:item="skill">
+                                            <span key={skill} class="skill-chip chip-missing">
+                                                <span class="chip-bullet">•</span>
+                                                <span class="chip-text">{skill}</span>
+                                            </span>
+                                        </template>
+                                        <template if:false={hasMissingSkills}>
+                                            <p class="slds-text-body_small slds-text-color_success slds-p-around_x-small">
+                                                ✓ All required role skills identified in candidate profile!
+                                            </p>
+                                        </template>
+                                    </div>
+
+                                    <!-- Context Notice regarding non-absolute claim -->
+                                    <div class="skill-gap-notice slds-m-top_x-small">
+                                        <p class="slds-text-body_extra-small slds-text-color_weak">
+                                            <em>Note: The required skills above were not identified in the verified profile data. This indicates an area for interview verification rather than a conclusive absence of ability.</em>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 6 & 7. EXPLANATION & RECRUITER ATTENTION -->
+                        <div class="slds-grid slds-gutters slds-wrap slds-m-bottom_medium">
+                            
+                            <!-- 7. RECRUITER ATTENTION (Practical Review Points) -->
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-m-bottom_small">
+                                <div class="slds-card slds-card_boundary slds-p-around_medium attention-card">
+                                    <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_small">
+                                        <lightning-icon icon-name="utility:announcement" size="small" class="slds-m-right_x-small text-brand"></lightning-icon>
+                                        <h4 class="slds-text-title_bold">RECRUITER ATTENTION</h4>
+                                    </div>
+                                    <p class="slds-text-body_small slds-m-bottom_small slds-text-color_weak">
+                                        Recommended focus areas derived strictly from candidate and requisition data:
+                                    </p>
+                                    <ul class="slds-list_dotted attention-list">
+                                        <template for:each={matchDetail.recruiterAttentionPoints} for:item="point">
+                                            <li key={point} class="attention-item">
+                                                {point}
+                                            </li>
+                                        </template>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- 6. EXPLANATION: WHY THIS MATCH? -->
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-m-bottom_small">
+                                <div class="slds-card slds-card_boundary slds-p-around_medium explanation-card">
+                                    <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_small">
+                                        <lightning-icon icon-name="utility:info_alt" size="small" class="slds-m-right_x-small"></lightning-icon>
+                                        <h4 class="slds-text-title_bold">WHY THIS MATCH?</h4>
+                                    </div>
+                                    <div class="explanation-content">
+                                        <pre class="explanation-text">{matchDetail.explanation}</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 9. RESPONSIBLE AI NOTICE -->
+                        <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_info responsible-ai-banner" role="alert">
+                            <span class="slds-assistive-text">Responsible AI Notice</span>
+                            <span class="slds-icon_container slds-icon-utility-shield slds-m-right_x-small">
+                                <lightning-icon icon-name="utility:shield" size="x-small" variant="inverse"></lightning-icon>
+                            </span>
+                            <h2 class="responsible-ai-text">
+                                <strong>Decision-Support Notice:</strong> Decision-support only. The match score is based on explicit job-relevant information and does not predict hiring probability. Final recruitment decisions remain with authorized human recruiters.
+                            </h2>
+                        </div>
+
+                    </template>
+
+                    <!-- Empty State if no match is selected -->
+                    <template if:false={hasMatchDetail}>
+                        <div class="slds-illustration slds-illustration_small slds-p-around_large slds-card slds-card_boundary text-center">
+                            <lightning-icon icon-name="utility:user" size="large" class="slds-m-bottom_small"></lightning-icon>
+                            <h3 class="slds-text-heading_medium">Select a Candidate</h3>
+                            <p class="slds-text-body_regular slds-text-color_weak slds-m-top_x-small">
+                                Choose a candidate from the pool on the left to inspect their explainable Match Intelligence breakdown.
+                            </p>
+                        </div>
+                    </template>
+                </div>
+            </div>
+            </template>
+        </template>
+    </div>
+</template>

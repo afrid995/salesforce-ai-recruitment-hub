@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Require_Closing_Date_When_Closed</fullName>
+    <active>true</active>
+    <description>If Status is Closed, require Closing Date.</description>
+    <errorConditionFormula>ISPICKVAL(Status__c, &apos;Closed&apos;) &amp;&amp; ISBLANK(Closing_Date__c)</errorConditionFormula>
+    <errorDisplayField>Closing_Date__c</errorDisplayField>
+    <errorMessage>Closing Date is required when Status is set to Closed.</errorMessage>
+</ValidationRule>

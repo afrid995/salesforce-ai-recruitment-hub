@@ -1,0 +1,370 @@
+<template>
+    <div class="comparison-container slds-card slds-p-around_medium">
+        
+        <!-- Header & Action Bar -->
+        <div class="slds-page-header slds-page-header_record-home slds-m-bottom_medium comp-header-card">
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-title">
+                    <div class="slds-media slds-media_center">
+                        <div class="slds-media__figure">
+                            <span class="slds-icon_container slds-icon-standard-metrics comp-icon">
+                                <lightning-icon icon-name="standard:metrics" size="medium" alternative-text="Candidate Comparison"></lightning-icon>
+                            </span>
+                        </div>
+                        <div class="slds-media__body">
+                            <div class="slds-page-header__name">
+                                <div class="slds-page-header__name-title">
+                                    <h1>
+                                        <span class="slds-text-title_bold slds-text-color_weak slds-text-transform_uppercase tracking-wide">
+                                            Decision-Support Workspace
+                                        </span>
+                                        <span class="slds-page-header__title slds-truncate comp-title" title="Candidate Comparison">
+                                            Candidate Comparison
+                                        </span>
+                                    </h1>
+                                </div>
+                            </div>
+                            <p class="slds-page-header__name-meta slds-text-body_small">
+                                Compare selected candidates using job-relevant match evidence • {jobTitle} ({jobCode})
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Actions -->
+                <div class="slds-page-header__col-actions">
+                    <lightning-button
+                        label="Back to Match Intelligence"
+                        icon-name="utility:back"
+                        variant="neutral"
+                        onclick={handleBack}>
+                    </lightning-button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <template if:true={isLoading}>
+            <div class="spinner-container">
+                <lightning-spinner alternative-text="Loading Comparison Data..." size="medium"></lightning-spinner>
+            </div>
+        </template>
+
+        <!-- Error State -->
+        <template if:true={errorMessage}>
+            <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error slds-m-bottom_medium" role="alert">
+                <span class="slds-icon_container slds-icon-utility-error slds-m-right_x-small">
+                    <lightning-icon icon-name="utility:error" size="x-small" variant="inverse"></lightning-icon>
+                </span>
+                <h2>{errorMessage}</h2>
+            </div>
+            <div class="slds-m-top_medium text-center">
+                <lightning-button label="Return to Match Intelligence" icon-name="utility:back" onclick={handleBack}></lightning-button>
+            </div>
+        </template>
+
+        <!-- Main Comparison Content -->
+        <template if:false={isLoading}>
+            <template if:true={hasData}>
+                
+                <!-- 3. HIGHEST MATCH INDICATOR BANNER -->
+                <div class="highest-score-banner slds-m-bottom_medium">
+                    <div class="slds-grid slds-grid_vertical-align-center">
+                        <div class="slds-media__figure">
+                            <span class="highest-badge-icon">
+                                <lightning-icon icon-name="utility:ribbon" size="small" variant="inverse"></lightning-icon>
+                            </span>
+                        </div>
+                        <div class="slds-col">
+                            <span class="highest-score-title">{highestScoreText}</span>
+                            <p class="highest-score-disclaimer">
+                                Informational metric only. Does not predict hiring probability or alter application status.
+                            </p>
+                        </div>
+                        <div class="slds-col_bump-left">
+                            <span class="slds-badge slds-badge_inverse">Comparing {candidateCount} Candidates</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. SIDE-BY-SIDE CANDIDATE COMPARISON MATRIX -->
+                <div class="comparison-scroll-wrapper slds-m-bottom_large">
+                    <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered comparison-table">
+                        <thead>
+                            <tr class="slds-line-height_reset header-row">
+                                <th scope="col" class="row-label-col">Evaluation Criteria</th>
+                                <template for:each={candidates} for:item="cand">
+                                    <th key={cand.matchId} scope="col" class={cand.columnHeaderClass}>
+                                        <div class="cand-header-box">
+                                            <template if:true={cand.isHighestScore}>
+                                                <div class="highest-match-tag">HIGHEST MATCH SCORE</div>
+                                            </template>
+                                            <h3 class="cand-name-title">
+                                                <a href="javascript:void(0);" onclick={handleNavigateCandidate} data-id={cand.candidateId}>
+                                                    {cand.candidateName}
+                                                </a>
+                                            </h3>
+                                            <div class="cand-score-large">{cand.overallScoreFormatted}</div>
+                                            <div class="cand-rec-badge">
+                                                <span class={cand.badgeClass}>{cand.recommendation}</span>
+                                            </div>
+                                        </div>
+                                    </th>
+                                </template>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                            <!-- Row: Candidate Profile Summary -->
+                            <tr class="section-divider-row">
+                                <td colspan={totalColumns} class="section-title">CANDIDATE BACKGROUND EVIDENCE</td>
+                            </tr>
+                            <tr>
+                                <td class="row-label font-bold">Experience</td>
+                                <template for:each={candidates} for:item="cand">
+                                    <td key={cand.matchId} class="data-cell">
+                                        <span class="font-semibold">{cand.candidateExperience} yrs</span>
+                                        <span class="slds-text-body_extra-small slds-text-color_weak block-text">Req: {jobExperienceRequired} yrs</span>
+                                    </td>
+                                </template>
+                            </tr>
+                            <tr>
+                                <td class="row-label font-bold">Education</td>
+                                <template for:each={candidates} for:item="cand">
+                                    <td key={cand.matchId} class="data-cell">
+                                        <span class="font-semibold">{cand.candidateQualification}</span>
+                                    </td>
+                                </template>
+                            </tr>
+                            <tr>
+                                <td class="row-label font-bold">Location</td>
+                                <template for:each={candidates} for:item="cand">
+                                    <td key={cand.matchId} class="data-cell">
+                                        <span>📍 {cand.candidateLocation}</span>
+                                    </td>
+                                </template>
+                            </tr>
+
+                            <!-- Row: 4. FACTOR COMPARISON (Scores & Weighted Contributions) -->
+                            <tr class="section-divider-row">
+                                <td colspan={totalColumns} class="section-title">FACTOR SCORE COMPARISON (WEIGHTED CONTRIBUTIONS)</td>
+                            </tr>
+                            <tr>
+                                <td class="row-label">
+                                    <span class="font-bold">Skill Match</span>
+                                    <span class="sublabel">Weight: {weights.skillWeight}%</span>
+                                </td>
+                                <template for:each={candidates} for:item="cand">
+                                    <td key={cand.matchId} class="data-cell">
+                                        <div class="score-line">
+                                            <span class="factor-val">{cand.skillScore}%</span>
+                                            <span class="contribution-pill">Contr: {cand.skillContribution}%</span>
+                                        </div>
+                                        <div class="slds-progress-bar slds-progress-bar_small slds-m-top_xx-small" role="progressbar" aria-valuenow={cand.skillScore} aria-valuemin="0" aria-valuemax="100">
+                                            <span class="slds-progress-bar__value bar-skill" style={cand.skillBarStyle}></span>
+                                        </div>
+                                    </td>
+                                </template>
+                            </tr>
+                            <tr>
+                                <td class="row-label">
+                                    <span class="font-bold">Experience Match</span>
+                                    <span class="sublabel">Weight: {weights.experienceWeight}%</span>
+                                </td>
+                                <template for:each={candidates} for:item="cand">
+                                    <td key={cand.matchId} class="data-cell">
+                                        <div class="score-line">
+                                            <span class="factor-val">{cand.experienceScore}%</span>
+                                            <span class="contribution-pill">Contr: {cand.experienceContribution}%</span>
+                                        </div>
+                                        <div class="slds-progress-bar slds-progress-bar_small slds-m-top_xx-small" role="progressbar" aria-valuenow={cand.experienceScore} aria-valuemin="0" aria-valuemax="100">
+                                            <span class="slds-progress-bar__value bar-exp" style={cand.expBarStyle}></span>
+                                        </div>
+                                    </td>
+                                </template>
+                            </tr>
+                            <tr>
+                                <td class="row-label">
+                                    <span class="font-bold">Qualification Match</span>
+                                    <span class="sublabel">Weight: {weights.qualificationWeight}%</span>
+                                </td>
+                                <template for:each={candidates} for:item="cand">
+                                    <td key={cand.matchId} class="data-cell">
+                                        <div class="score-line">
+                                            <span class="factor-val">{cand.qualificationScore}%</span>
+                                            <span class="contribution-pill">Contr: {cand.qualificationContribution}%</span>
+                                        </div>
+                                        <div class="slds-progress-bar slds-progress-bar_small slds-m-top_xx-small" role="progressbar" aria-valuenow={cand.qualificationScore} aria-valuemin="0" aria-valuemax="100">
+                                            <span class="slds-progress-bar__value bar-qual" style={cand.qualBarStyle}></span>
+                                        </div>
+                                    </td>
+                                </template>
+                            </tr>
+                            <tr>
+                                <td class="row-label">
+                                    <span class="font-bold">Location Compatibility</span>
+                                    <span class="sublabel">Weight: {weights.locationWeight}%</span>
+                                </td>
+                                <template for:each={candidates} for:item="cand">
+                                    <td key={cand.matchId} class="data-cell">
+                                        <div class="score-line">
+                                            <span class="factor-val">{cand.locationScore}%</span>
+                                            <span class="contribution-pill">Contr: {cand.locationContribution}%</span>
+                                        </div>
+                                        <div class="slds-progress-bar slds-progress-bar_small slds-m-top_xx-small" role="progressbar" aria-valuenow={cand.locationScore} aria-valuemin="0" aria-valuemax="100">
+                                            <span class="slds-progress-bar__value bar-loc" style={cand.locBarStyle}></span>
+                                        </div>
+                                    </td>
+                                </template>
+                            </tr>
+
+                            <!-- Row: Overall Score Formula Summary -->
+                            <tr>
+                                <td class="row-label font-bold overall-label">
+                                    Overall Match Score
+                                </td>
+                                <template for:each={candidates} for:item="cand">
+                                    <td key={cand.matchId} class="data-cell overall-cell">
+                                        <div class="overall-sum-text">{cand.overallScoreFormatted}</div>
+                                        <div class="slds-text-body_extra-small slds-text-color_weak formula-detail">
+                                            {cand.formulaExplanation}
+                                        </div>
+                                    </td>
+                                </template>
+                            </tr>
+
+                            <!-- Row: 5. SKILLS EVIDENCE (Matched vs Gaps) -->
+                            <tr class="section-divider-row">
+                                <td colspan={totalColumns} class="section-title">SKILLS EVIDENCE</td>
+                            </tr>
+                            <tr>
+                                <td class="row-label font-bold text-success">
+                                    Matched Skills
+                                </td>
+                                <template for:each={candidates} for:item="cand">
+                                    <td key={cand.matchId} class="data-cell">
+                                        <div class="comp-skill-chips">
+                                            <template for:each={cand.matchedSkillsList} for:item="s">
+                                                <span key={s} class="comp-chip comp-chip-matched">✓ {s}</span>
+                                            </template>
+                                            <template if:false={cand.hasMatchedSkills}>
+                                                <span class="slds-text-color_weak slds-text-body_extra-small">None identified</span>
+                                            </template>
+                                        </div>
+                                    </td>
+                                </template>
+                            </tr>
+                            <tr>
+                                <td class="row-label font-bold text-warning">
+                                    Skill Gaps
+                                    <span class="sublabel font-normal">Not identified in profile</span>
+                                </td>
+                                <template for:each={candidates} for:item="cand">
+                                    <td key={cand.matchId} class="data-cell">
+                                        <div class="comp-skill-chips">
+                                            <template for:each={cand.missingSkillsList} for:item="s">
+                                                <span key={s} class="comp-chip comp-chip-missing">• {s}</span>
+                                            </template>
+                                            <template if:false={cand.hasMissingSkills}>
+                                                <span class="slds-text-color_success font-semibold text-xs">✓ Complete Coverage</span>
+                                            </template>
+                                        </div>
+                                    </td>
+                                </template>
+                            </tr>
+
+                            <!-- Row: 6. RECRUITER ATTENTION -->
+                            <tr class="section-divider-row">
+                                <td colspan={totalColumns} class="section-title">RECRUITER ATTENTION (REVIEW OBSERVATIONS)</td>
+                            </tr>
+                            <tr>
+                                <td class="row-label font-bold">
+                                    Key Observations
+                                    <span class="sublabel font-normal">Informational points for interview</span>
+                                </td>
+                                <template for:each={candidates} for:item="cand">
+                                    <td key={cand.matchId} class="data-cell">
+                                        <ul class="slds-list_dotted attention-list-comp">
+                                            <template for:each={cand.recruiterAttentionPoints} for:item="point">
+                                                <li key={point} class="attention-bullet-comp">{point}</li>
+                                            </template>
+                                        </ul>
+                                    </td>
+                                </template>
+                            </tr>
+
+                            <!-- Row: 7. EXPLANATION -->
+                            <tr class="section-divider-row">
+                                <td colspan={totalColumns} class="section-title">EXPLAINABLE RATIONALE (WHY THIS MATCH?)</td>
+                            </tr>
+                            <tr>
+                                <td class="row-label font-bold">Why This Match?</td>
+                                <template for:each={candidates} for:item="cand">
+                                    <td key={cand.matchId} class="data-cell explanation-cell">
+                                        <div class="comp-explanation-box">
+                                            <pre class="comp-explanation-pre">{cand.explanation}</pre>
+                                        </div>
+                                    </td>
+                                </template>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 5. CROSS-CANDIDATE SKILL MATRIX SECTION -->
+                <div class="slds-card slds-card_boundary slds-p-around_medium slds-m-bottom_medium skill-matrix-card">
+                    <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_small">
+                        <lightning-icon icon-name="utility:matrix" size="small" class="slds-m-right_x-small text-brand"></lightning-icon>
+                        <div>
+                            <h3 class="slds-text-heading_small slds-font-weight_bold">
+                                Cross-Candidate Skill Comparison Matrix
+                            </h3>
+                            <p class="slds-text-body_small slds-text-color_weak">
+                                Role Required Competencies evaluated across candidate profiles
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="table-scroll-container">
+                        <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered skill-matrix-table">
+                            <thead>
+                                <tr class="slds-line-height_reset">
+                                    <th scope="col" class="skill-name-col">Skill / Competency</th>
+                                    <template for:each={skillMatrixCandidates} for:item="name">
+                                        <th key={name} scope="col" class="matrix-cand-col">{name}</th>
+                                    </template>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template for:each={skillMatrixRows} for:item="row">
+                                    <tr key={row.skill}>
+                                        <td class="skill-name-col font-semibold">
+                                            {row.skill}
+                                        </td>
+                                        <template for:each={row.cells} for:item="cell">
+                                            <td key={cell.candidateId} class={cell.cellClass}>
+                                                <span class="matrix-symbol">{cell.symbol}</span>
+                                            </td>
+                                        </template>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 8. RESPONSIBLE AI NOTICE -->
+                <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_info responsible-ai-banner" role="alert">
+                    <span class="slds-assistive-text">Responsible AI Notice</span>
+                    <span class="slds-icon_container slds-icon-utility-shield slds-m-right_x-small">
+                        <lightning-icon icon-name="utility:shield" size="x-small" variant="inverse"></lightning-icon>
+                    </span>
+                    <h2 class="responsible-ai-text">
+                        <strong>Decision-Support Notice:</strong> {responsibleAiNotice}
+                    </h2>
+                </div>
+
+            </template>
+        </template>
+    </div>
+</template>

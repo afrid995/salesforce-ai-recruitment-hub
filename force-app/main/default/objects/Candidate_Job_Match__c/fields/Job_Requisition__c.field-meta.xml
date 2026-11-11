@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Job_Requisition__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>The job requisition evaluated for this match</description>
+    <label>Job Requisition</label>
+    <referenceTo>Job_Requisition__c</referenceTo>
+    <relationshipLabel>Candidate Job Matches</relationshipLabel>
+    <relationshipName>Candidate_Job_Matches</relationshipName>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Lookup</type>
+</CustomField>

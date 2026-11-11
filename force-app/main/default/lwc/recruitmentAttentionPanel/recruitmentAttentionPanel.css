@@ -1,0 +1,111 @@
+.attention-panel-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.kpi-metric-box {
+    border-radius: 6px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.kpi-metric-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+}
+
+.metric-high {
+    border-left: 4px solid #ea001e;
+}
+
+.metric-review {
+    border-left: 4px solid #fe9339;
+}
+
+.metric-interview {
+    border-left: 4px solid #ba0517;
+}
+
+.metric-jobs {
+    border-left: 4px solid #706e6b;
+}
+
+.metric-number {
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.metric-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #444444;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Signal Cards */
+.signal-card {
+    border-radius: 6px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.signal-card:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.signal-high {
+    border-left: 5px solid #ea001e;
+    background: #fffafa;
+}
+
+.signal-review {
+    border-left: 5px solid #fe9339;
+    background: #fffdfa;
+}
+
+.signal-info {
+    border-left: 5px solid #0176d3;
+    background: #fbfdff;
+}
+
+/* Badges */
+.badge-high {
+    background-color: #ea001e;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.badge-review {
+    background-color: #fe9339;
+    color: #080707;
+    font-weight: 700;
+}
+
+.badge-info {
+    background-color: #0176d3;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.evidence-box {
+    background-color: #f3f3f3;
+    border-radius: 4px;
+    border-left: 3px solid #706e6b;
+    font-family: inherit;
+    font-size: 0.8125rem;
+}
+
+.explanation-text {
+    font-size: 0.875rem;
+    color: #2b2826;
+    line-height: 1.4;
+}
+
+.action-bar {
+    border-top: 1px solid #f2f2f2;
+}

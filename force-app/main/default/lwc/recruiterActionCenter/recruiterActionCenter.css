@@ -1,0 +1,146 @@
+.spinner-container {
+    min-height: 120px;
+}
+
+.kpi-card {
+    border-radius: 6px;
+    background: #ffffff;
+    border: 1px solid #d8dde6;
+    transition: all 0.2s ease-in-out;
+}
+
+.kpi-card:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.kpi-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #54698d;
+}
+
+.kpi-value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin: 4px 0;
+}
+
+.kpi-sub {
+    font-size: 0.7rem;
+    color: #706e6b;
+}
+
+.kpi-high {
+    border-top: 4px solid #c23934;
+}
+.kpi-high .kpi-value {
+    color: #c23934;
+}
+
+.kpi-review {
+    border-top: 4px solid #fe9339;
+}
+.kpi-review .kpi-value {
+    color: #b86200;
+}
+
+.kpi-info {
+    border-top: 4px solid #0070d2;
+}
+.kpi-info .kpi-value {
+    color: #0070d2;
+}
+
+.kpi-ack {
+    border-top: 4px solid #9050e9;
+}
+.kpi-ack .kpi-value {
+    color: #7030a0;
+}
+
+.kpi-res {
+    border-top: 4px solid #04844b;
+}
+.kpi-res .kpi-value {
+    color: #04844b;
+}
+
+.alert-card {
+    border-radius: 6px;
+    background: #ffffff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    border-left: 5px solid #d8dde6;
+    transition: all 0.2s ease;
+}
+
+.alert-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.card-high {
+    border-left-color: #c23934;
+    background-color: #fff9f9;
+}
+
+.card-review {
+    border-left-color: #fe9339;
+    background-color: #fffcf5;
+}
+
+.card-info {
+    border-left-color: #0070d2;
+    background-color: #f7faff;
+}
+
+.badge-high {
+    background-color: #c23934;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.badge-review {
+    background-color: #fe9339;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.badge-info {
+    background-color: #0070d2;
+    color: #ffffff;
+}
+
+.badge-active {
+    background-color: #0070d2;
+    color: #ffffff;
+}
+
+.badge-ack {
+    background-color: #9050e9;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.badge-resolved {
+    background-color: #04844b;
+    color: #ffffff;
+}
+
+.evidence-box {
+    background-color: #ffffff;
+    border-color: #e0e5ee;
+}
+
+.ack-banner {
+    background-color: #f3e8fd;
+    border-left: 3px solid #9050e9;
+    color: #44176d;
+}
+
+.font-bold {
+    font-weight: 700;
+}
+
+.font-medium {
+    font-weight: 600;
+}

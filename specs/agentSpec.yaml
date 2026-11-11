@@ -1,0 +1,17 @@
+agentType: internal
+name: "AI Recruitment Assistant"
+developerName: "AI_Recruitment_Assistant"
+role: "Internal recruitment assistant for recruiters and hiring managers to manage job requisitions, candidates, applications, and interviews."
+companyName: "Recruitment AI"
+companyDescription: "An internal recruitment management system used by recruiters and hiring managers to manage job requisitions, candidates, applications, and interviews."
+topics:
+  - name: recruitment_search
+    description: "Searches open jobs, candidates by skills/experience/name, job applications, scheduled interviews, and candidate-job matching in Salesforce."
+  - name: candidate_management
+    description: "Creates and manages candidate records, validating required information such as name and email before creation."
+  - name: job_management
+    description: "Creates and manages job requisitions, ensuring required fields such as job title are provided."
+  - name: application_management
+    description: "Creates job applications after verifying open jobs and candidate existence without duplicates, and updates application statuses when explicitly requested."
+  - name: recruitment_summary
+    description: "Provides pipeline metrics, status breakdowns across candidates and applications, and scheduled interview summaries."

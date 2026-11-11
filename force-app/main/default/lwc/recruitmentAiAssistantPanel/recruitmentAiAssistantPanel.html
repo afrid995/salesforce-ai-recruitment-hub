@@ -1,0 +1,252 @@
+<template>
+    <div class="assistant-container slds-p-around_medium">
+        <!-- TOP HEADER BANNER -->
+        <div class="assistant-header slds-p-around_large slds-m-bottom_medium">
+            <div class="slds-grid slds-grid_vertical-align-center slds-wrap">
+                <div class="slds-col slds-size_1-1 slds-medium-size_8-12">
+                    <div class="slds-media slds-media_center">
+                        <div class="slds-media__figure">
+                            <span class="bot-icon-wrapper">
+                                <lightning-icon icon-name="standard:bot" size="large" alternative-text="AI Recruitment Assistant"></lightning-icon>
+                            </span>
+                        </div>
+                        <div class="slds-media__body">
+                            <div class="slds-text-title_bold assistant-tag">AGENTFORCE INTELLIGENCE HUB</div>
+                            <h1 class="slds-text-heading_large slds-text-color_inverse slds-text-title_bold">{agentInfo.masterLabel}</h1>
+                            <p class="assistant-desc slds-m-top_xx-small">
+                                Developer Name: <code>{agentInfo.developerName}</code> | Type: <code>{agentInfo.agentType}</code> | Format: Agentforce DX
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-col slds-size_1-1 slds-medium-size_4-12 slds-text-align_right slds-m-top_small slds-medium-m-top_none">
+                    <span class="slds-badge slds-theme_success slds-p-around_x-small slds-m-right_x-small">
+                        <lightning-icon icon-name="utility:check" size="x-small" variant="inverse" class="slds-m-right_xx-small"></lightning-icon>
+                        Live Agent Active
+                    </span>
+                    <lightning-button 
+                        label="Launch Panel" 
+                        icon-name="utility:new_window" 
+                        variant="neutral" 
+                        onclick={handleLaunchNativePanel}
+                        class="slds-m-right_x-small">
+                    </lightning-button>
+                    <lightning-button 
+                        label="New Session" 
+                        icon-name="utility:refresh" 
+                        variant="neutral" 
+                        onclick={handleClearChat}>
+                    </lightning-button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TWO COLUMN LAYOUT: LIVE CHAT (LEFT) & AGENT SPECS / PROMPTS (RIGHT) -->
+        <div class="slds-grid slds-wrap slds-gutters">
+            
+            <!-- LEFT COLUMN: LIVE CHAT INTERFACE (7 of 12) -->
+            <div class="slds-col slds-size_1-1 slds-large-size_7-12 slds-m-bottom_medium">
+                <div class="slds-card chat-card h-100">
+                    <!-- Chat Header -->
+                    <div class="chat-header slds-p-around_medium slds-grid slds-grid_vertical-align-center">
+                        <lightning-icon icon-name="utility:chat" size="small" class="slds-m-right_small"></lightning-icon>
+                        <div class="slds-grow">
+                            <h2 class="slds-text-title_bold slds-text-heading_small">Live Agentforce Conversation</h2>
+                            <p class="slds-text-body_small slds-text-color_weak">
+                                Connected to <strong>{agentInfo.masterLabel}</strong> &bull; Live Salesforce Record Grounding
+                            </p>
+                        </div>
+                        <template if:true={sessionId}>
+                            <span class="slds-badge slds-badge_lightest">Active Session</span>
+                        </template>
+                    </div>
+
+                    <!-- Chat Messages Stream -->
+                    <div class="chat-messages slds-p-around_medium">
+                        <template for:each={messages} for:item="msg">
+                            <!-- User Message -->
+                            <template if:true={msg.isUser}>
+                                <div key={msg.id} class="chat-row chat-row_user slds-m-bottom_medium">
+                                    <div class="chat-bubble chat-bubble_user">
+                                        <div class="chat-bubble-header slds-m-bottom_xx-small">
+                                            <span class="chat-sender">{msg.sender}</span>
+                                            <span class="chat-time slds-m-left_x-small">{msg.time}</span>
+                                        </div>
+                                        <div class="chat-text">{msg.text}</div>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <!-- Agent Message -->
+                            <template if:true={msg.isAgent}>
+                                <div key={msg.id} class="chat-row chat-row_agent slds-m-bottom_medium">
+                                    <div class="chat-avatar slds-m-right_x-small">
+                                        <lightning-icon icon-name="standard:bot" size="x-small"></lightning-icon>
+                                    </div>
+                                    <div class="chat-bubble chat-bubble_agent">
+                                        <div class="chat-bubble-header slds-m-bottom_xx-small">
+                                            <span class="chat-sender">{msg.sender}</span>
+                                            <span class="chat-time slds-m-left_x-small">{msg.time}</span>
+                                        </div>
+                                        <div class="chat-text formatted-agent-text">{msg.text}</div>
+                                    </div>
+                                </div>
+                            </template>
+                        </template>
+
+                        <!-- Loading Indicator -->
+                        <template if:true={isLoading}>
+                            <div class="chat-row chat-row_agent slds-m-bottom_medium">
+                                <div class="chat-avatar slds-m-right_x-small">
+                                    <lightning-icon icon-name="standard:bot" size="x-small"></lightning-icon>
+                                </div>
+                                <div class="chat-bubble chat-bubble_agent chat-loading-bubble">
+                                    <div class="slds-grid slds-grid_vertical-align-center">
+                                        <div class="typing-indicator slds-m-right_small">
+                                            <span></span>
+                                            <span></span>
+                                            <span></span>
+                                        </div>
+                                        <span class="slds-text-body_small slds-text-color_weak">
+                                            AI Recruitment Assistant is processing &amp; querying live Salesforce data...
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+
+                    <!-- Chat Input Footer -->
+                    <div class="chat-footer slds-p-around_medium">
+                        <!-- Quick Prompt Chips -->
+                        <div class="quick-chips-wrapper slds-m-bottom_small">
+                            <span class="slds-text-title_caps slds-m-right_x-small quick-label">Quick Ask:</span>
+                            <button type="button" class="quick-chip" data-prompt="Give me a recruitment pipeline summary." onclick={handlePromptClick}>
+                                📊 Pipeline Summary
+                            </button>
+                            <button type="button" class="quick-chip" data-prompt="Show upcoming interviews." onclick={handlePromptClick}>
+                                📅 Upcoming Interviews
+                            </button>
+                            <button type="button" class="quick-chip" data-prompt="Find candidates with Python skills." onclick={handlePromptClick}>
+                                🔍 Python Candidates
+                            </button>
+                            <button type="button" class="quick-chip" data-prompt="Show open AI/ML Engineer jobs." onclick={handlePromptClick}>
+                                💼 Open AI/ML Jobs
+                            </button>
+                        </div>
+
+                        <!-- Input and Send Button -->
+                        <div class="slds-grid slds-grid_vertical-align-center">
+                            <div class="slds-grow slds-m-right_small">
+                                <input 
+                                    type="text" 
+                                    class="chat-input slds-input" 
+                                    placeholder="Ask about open jobs, candidates, interviews, or pipeline summary..."
+                                    value={inputMessage}
+                                    oninput={handleInputChange}
+                                    onkeydown={handleKeyDown}
+                                    disabled={isLoading} />
+                            </div>
+                            <lightning-button 
+                                variant="brand" 
+                                label="Send" 
+                                icon-name="utility:send" 
+                                onclick={handleSendMessage}
+                                disabled={isSendDisabled}>
+                            </lightning-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: PROMPT LIBRARY & ARCHITECTURE TABS (5 of 12) -->
+            <div class="slds-col slds-size_1-1 slds-large-size_5-12 slds-m-bottom_medium">
+                <div class="slds-card slds-p-around_medium h-100">
+                    <lightning-tabset>
+                        <!-- TAB 1: PROMPT LIBRARY -->
+                        <lightning-tab label="Verified Prompts" icon-name="utility:prompt">
+                            <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_small">
+                                Click <strong>Ask Agent</strong> on any prompt to send it directly to the live conversation, or copy the utterance.
+                            </p>
+                            <div class="prompts-scroll-area">
+                                <template for:each={prompts} for:item="p">
+                                    <div key={p.utterance} class="prompt-card slds-p-around_small slds-m-bottom_small">
+                                        <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_xx-small">
+                                            <span class="slds-badge slds-badge_lightest">{p.target}</span>
+                                            <span class="slds-text-title_bold slds-m-left_small prompt-title slds-grow">{p.title}</span>
+                                        </div>
+                                        <div class="prompt-quote">"{p.utterance}"</div>
+                                        <div class="prompt-expected slds-m-top_xx-small slds-m-bottom_small">
+                                            <strong>Expected:</strong> {p.expected}
+                                        </div>
+                                        <div class="slds-grid slds-grid_align-end">
+                                            <button 
+                                                type="button" 
+                                                class="slds-button slds-button_neutral slds-button_small slds-m-right_x-small" 
+                                                data-prompt={p.utterance} 
+                                                onclick={handleCopyPrompt}>
+                                                Copy
+                                            </button>
+                                            <button 
+                                                type="button" 
+                                                class="slds-button slds-button_brand slds-button_small" 
+                                                data-prompt={p.utterance} 
+                                                onclick={handlePromptClick}>
+                                                Ask Agent
+                                            </button>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </lightning-tab>
+
+                        <!-- TAB 2: AGENT ARCHITECTURE -->
+                        <lightning-tab label="Agent Architecture" icon-name="utility:flow">
+                            <!-- Runtime Metadata Box -->
+                            <div class="status-box slds-p-around_small slds-m-bottom_small">
+                                <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_xx-small">
+                                    <lightning-icon icon-name="utility:connected_apps" size="x-small" variant="brand" class="slds-m-right_x-small"></lightning-icon>
+                                    <span class="slds-text-title_bold">Agentforce Runtime Architecture</span>
+                                </div>
+                                <div class="slds-text-body_small slds-text-color_weak">
+                                    &bull; <strong>Engine:</strong> Salesforce Agentforce Platform<br/>
+                                    &bull; <strong>Agent Type:</strong> EinsteinServiceAgent (ExternalCopilot)<br/>
+                                    &bull; <strong>Execution User:</strong> <code>agent.user.3adbc4693273@agentforce.com</code><br/>
+                                    &bull; <strong>Status:</strong> Active (Version v1)
+                                </div>
+                            </div>
+
+                            <!-- Human in the Loop Guardrails -->
+                            <div class="status-box slds-p-around_small slds-m-bottom_small">
+                                <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_xx-small">
+                                    <lightning-icon icon-name="utility:shield" size="x-small" variant="warning" class="slds-m-right_x-small"></lightning-icon>
+                                    <span class="slds-text-title_bold">Human-in-the-Loop Guardrails</span>
+                                </div>
+                                <div class="slds-text-body_small slds-text-color_weak">
+                                    Strict safety rules prevent autonomous candidate selection or rejection. The agent explicitly refers hiring decisions to human recruiters.
+                                </div>
+                            </div>
+
+                            <!-- Subagents Catalog -->
+                            <h3 class="slds-text-title_bold slds-m-bottom_xx-small">Configured Subagents</h3>
+                            <div class="subagents-list">
+                                <template for:each={subagents} for:item="sub">
+                                    <div key={sub.name} class="subagent-item slds-p-around_x-small slds-m-bottom_x-small">
+                                        <div class="slds-grid slds-grid_vertical-align-center">
+                                            <lightning-icon icon-name="utility:flow" size="x-small" class="slds-m-right_x-small"></lightning-icon>
+                                            <div class="slds-grow">
+                                                <span class="slds-text-title_bold">{sub.label}</span>
+                                                <code class="slds-m-left_x-small slds-text-body_small">{sub.name}</code>
+                                                <div class="slds-text-color_weak slds-text-body_small">{sub.desc}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </lightning-tab>
+                    </lightning-tabset>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

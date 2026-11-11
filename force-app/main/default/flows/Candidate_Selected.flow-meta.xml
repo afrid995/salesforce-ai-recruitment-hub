@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>67.0</apiVersion>
+    <description>When a Job Application status becomes Selected, update related Candidate status to Selected.</description>
+    <environments>Default</environments>
+    <interviewLabel>Candidate Selected {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Candidate Selected</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordUpdates>
+        <name>Update_Candidate_To_Selected</name>
+        <label>Update Candidate To Selected</label>
+        <locationX>176</locationX>
+        <locationY>323</locationY>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Candidate__c</elementReference>
+            </value>
+        </filters>
+        <inputAssignments>
+            <field>Candidate_Status__c</field>
+            <value>
+                <stringValue>Selected</stringValue>
+            </value>
+        </inputAssignments>
+        <object>Candidate__c</object>
+    </recordUpdates>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Update_Candidate_To_Selected</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Application_Status__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Selected</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>Candidate__c</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
+        <object>Job_Application__c</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

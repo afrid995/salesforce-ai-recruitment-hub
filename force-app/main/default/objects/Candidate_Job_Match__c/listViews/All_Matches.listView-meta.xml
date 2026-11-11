@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>All_Matches</fullName>
+    <columns>NAME</columns>
+    <columns>Candidate__c</columns>
+    <columns>Job_Requisition__c</columns>
+    <columns>Overall_Match_Score__c</columns>
+    <columns>Recommendation__c</columns>
+    <columns>Skill_Match_Percent__c</columns>
+    <columns>Experience_Match_Percent__c</columns>
+    <columns>Qualification_Match_Percent__c</columns>
+    <columns>Location_Match_Percent__c</columns>
+    <columns>Calculated_On__c</columns>
+    <columns>Evaluation_Status__c</columns>
+    <filterScope>Everything</filterScope>
+    <label>All Candidate Job Matches</label>
+    <sharedTo>
+        <allInternalUsers></allInternalUsers>
+    </sharedTo>
+</ListView>

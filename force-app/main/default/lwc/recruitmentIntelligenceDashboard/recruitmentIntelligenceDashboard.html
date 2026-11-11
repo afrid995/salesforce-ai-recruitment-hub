@@ -1,0 +1,522 @@
+<template>
+    <div class="dashboard-container slds-p-around_medium">
+
+        <!-- HEADER -->
+        <div class="slds-page-header slds-page-header_record-home slds-m-bottom_medium slds-box slds-theme_default">
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-title">
+                    <div class="slds-media slds-media_center">
+                        <div class="slds-media__figure">
+                            <lightning-icon icon-name="standard:insights" size="medium"></lightning-icon>
+                        </div>
+                        <div class="slds-media__body">
+                            <h1 class="slds-page-header__title slds-truncate">Recruitment Intelligence & Operational Insights</h1>
+                            <p class="slds-text-body_small slds-text-color_weak">
+                                Organization-level recruitment pipeline health, job coverage, candidate match intelligence, skill gaps, and interview bottlenecks.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-page-header__col-actions">
+                    <div class="slds-page-header__control">
+                        <lightning-button-group>
+                            <lightning-button label="Refresh" icon-name="utility:refresh" onclick={handleRefresh}></lightning-button>
+                            <lightning-button label="Match Intelligence" icon-name="custom:custom62" onclick={handleOpenMatchIntelligence}></lightning-button>
+                            <lightning-button label="Compare Candidates" icon-name="utility:multi_picklist" onclick={handleOpenCandidateComparison}></lightning-button>
+                            <lightning-button variant="brand" label="Ask Agentforce" icon-name="utility:einstein" onclick={handleOpenAgentforce}></lightning-button>
+                        </lightning-button-group>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESPONSIBLE AI NOTICE BANNER -->
+        <div class="slds-notify slds-notify_alert slds-alert_info slds-m-bottom_medium" role="alert">
+            <lightning-icon icon-name="utility:shield" size="x-small" variant="inverse" class="slds-m-right_x-small"></lightning-icon>
+            <h2>
+                <strong>Responsible AI & Decision-Support Guardrail:</strong>
+                All metrics, match scores, and coverage classifications evaluate objective, job-relevant competencies, experience, education, and location. They do not predict hiring probability and exclude protected characteristics. All final shortlisting and selection decisions must be made by human recruiters.
+            </h2>
+        </div>
+
+        <!-- FILTERS BAR -->
+        <lightning-card title="Operational Filters" icon-name="utility:filterList" class="slds-m-bottom_medium">
+            <div class="slds-p-horizontal_medium slds-p-bottom_medium">
+                <div class="slds-grid slds-gutters slds-wrap slds-grid_vertical-align-end">
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+                        <lightning-combobox
+                            name="jobFilter"
+                            label="Job Requisition"
+                            value={selectedJobId}
+                            options={jobOptions}
+                            data-filter="jobId"
+                            onchange={handleFilterChange}>
+                        </lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12">
+                        <lightning-combobox
+                            name="deptFilter"
+                            label="Department"
+                            value={selectedDepartment}
+                            options={departmentOptions}
+                            data-filter="department"
+                            onchange={handleFilterChange}>
+                        </lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12">
+                        <lightning-combobox
+                            name="jobStatusFilter"
+                            label="Job Status"
+                            value={selectedJobStatus}
+                            options={jobStatusOptions}
+                            data-filter="jobStatus"
+                            onchange={handleFilterChange}>
+                        </lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12">
+                        <lightning-combobox
+                            name="appStatusFilter"
+                            label="Application Status"
+                            value={selectedAppStatus}
+                            options={appStatusOptions}
+                            data-filter="appStatus"
+                            onchange={handleFilterChange}>
+                        </lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12">
+                        <lightning-combobox
+                            name="tierFilter"
+                            label="Match Tier"
+                            value={selectedRecommendationTier}
+                            options={recommendationOptions}
+                            data-filter="recommendationTier"
+                            onchange={handleFilterChange}>
+                        </lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-12 slds-text-align_right">
+                        <lightning-button label="Reset" icon-name="utility:clear" onclick={handleResetFilters}></lightning-button>
+                    </div>
+                </div>
+            </div>
+        </lightning-card>
+
+        <!-- LOADING SPINNER -->
+        <template if:true={isLoading}>
+            <div class="slds-p-around_large slds-text-align_center">
+                <lightning-spinner alternative-text="Loading Recruitment Intelligence..." size="medium"></lightning-spinner>
+            </div>
+        </template>
+
+        <template if:true={hasData}>
+            <!-- CORE KPI SECTION -->
+            <div class="slds-m-bottom_medium">
+                <div class="slds-grid slds-gutters slds-wrap">
+                    <!-- Open Jobs -->
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_3-of-12 slds-m-bottom_medium">
+                        <div class="kpi-card slds-p-around_medium" data-target="jobs" onclick={navigateToKpi}>
+                            <div class="slds-grid slds-grid_vertical-align-center">
+                                <div class="slds-m-right_small">
+                                    <lightning-icon icon-name="standard:work_type" size="medium"></lightning-icon>
+                                </div>
+                                <div>
+                                    <div class="kpi-value">{data.kpis.openJobs}</div>
+                                    <div class="kpi-label">Open Jobs</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Total Candidates -->
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_3-of-12 slds-m-bottom_medium">
+                        <div class="kpi-card slds-p-around_medium" data-target="candidates" onclick={navigateToKpi}>
+                            <div class="slds-grid slds-grid_vertical-align-center">
+                                <div class="slds-m-right_small">
+                                    <lightning-icon icon-name="standard:contact" size="medium"></lightning-icon>
+                                </div>
+                                <div>
+                                    <div class="kpi-value">{data.kpis.totalCandidates}</div>
+                                    <div class="kpi-label">Total Candidates</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Total Applications -->
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_3-of-12 slds-m-bottom_medium">
+                        <div class="kpi-card slds-p-around_medium" data-target="applications" onclick={navigateToKpi}>
+                            <div class="slds-grid slds-grid_vertical-align-center">
+                                <div class="slds-m-right_small">
+                                    <lightning-icon icon-name="standard:case" size="medium"></lightning-icon>
+                                </div>
+                                <div>
+                                    <div class="kpi-value">{data.kpis.totalApplications}</div>
+                                    <div class="kpi-label">Total Applications</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Shortlisted Applications -->
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_3-of-12 slds-m-bottom_medium">
+                        <div class="kpi-card slds-p-around_medium" data-target="applications" onclick={navigateToKpi}>
+                            <div class="slds-grid slds-grid_vertical-align-center">
+                                <div class="slds-m-right_small">
+                                    <lightning-icon icon-name="standard:task" size="medium"></lightning-icon>
+                                </div>
+                                <div>
+                                    <div class="kpi-value">{data.kpis.shortlistedApplications}</div>
+                                    <div class="kpi-label">Shortlisted Apps</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Interviewed Applications -->
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_3-of-12 slds-m-bottom_medium">
+                        <div class="kpi-card slds-p-around_medium" data-target="applications" onclick={navigateToKpi}>
+                            <div class="slds-grid slds-grid_vertical-align-center">
+                                <div class="slds-m-right_small">
+                                    <lightning-icon icon-name="standard:event" size="medium"></lightning-icon>
+                                </div>
+                                <div>
+                                    <div class="kpi-value">{data.kpis.interviewedApplications}</div>
+                                    <div class="kpi-label">Interviewed Apps</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Selected Candidates -->
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_3-of-12 slds-m-bottom_medium">
+                        <div class="kpi-card slds-p-around_medium" data-target="candidates" onclick={navigateToKpi}>
+                            <div class="slds-grid slds-grid_vertical-align-center">
+                                <div class="slds-m-right_small">
+                                    <lightning-icon icon-name="standard:approval" size="medium"></lightning-icon>
+                                </div>
+                                <div>
+                                    <div class="kpi-value">{data.kpis.selectedCandidates}</div>
+                                    <div class="kpi-label">Selected Candidates</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Upcoming Interviews -->
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_3-of-12 slds-m-bottom_medium">
+                        <div class="kpi-card slds-p-around_medium" data-target="interviews" onclick={navigateToKpi}>
+                            <div class="slds-grid slds-grid_vertical-align-center">
+                                <div class="slds-m-right_small">
+                                    <lightning-icon icon-name="standard:service_appointment" size="medium"></lightning-icon>
+                                </div>
+                                <div>
+                                    <div class="kpi-value">{data.kpis.upcomingInterviews}</div>
+                                    <div class="kpi-label">Upcoming Interviews</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Average Match Score -->
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_3-of-12 slds-m-bottom_medium">
+                        <div class="kpi-card slds-p-around_medium" data-target="matches" onclick={navigateToKpi}>
+                            <div class="slds-grid slds-grid_vertical-align-center">
+                                <div class="slds-m-right_small">
+                                    <lightning-icon icon-name="custom:custom62" size="medium"></lightning-icon>
+                                </div>
+                                <div>
+                                    <div class="kpi-value">{data.kpis.averageCandidateMatchScore}%</div>
+                                    <div class="kpi-label">Avg Match Score</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RECRUITMENT RISK & ATTENTION INTELLIGENCE (PHASE 5) -->
+            <div class="slds-m-bottom_medium">
+                <c-recruitment-attention-panel is-embedded="true"></c-recruitment-attention-panel>
+            </div>
+
+            <!-- RECRUITMENT PIPELINE STAGES -->
+            <div class="slds-m-bottom_medium">
+                <lightning-card title="Recruitment Pipeline Distribution" icon-name="utility:graph">
+                    <div class="slds-p-horizontal_medium slds-p-bottom_medium">
+                        <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_small">
+                            Application distribution across active operational stages. <em>Note: Application Status reflects pipeline progression and is distinct from candidate match recommendation classifications.</em>
+                        </p>
+                        <!-- Stage cards grid -->
+                        <div class="slds-grid slds-gutters slds-wrap slds-m-bottom_small">
+                            <template for:each={data.pipelineStages} for:item="stage">
+                                <div key={stage.stageName} class="slds-col slds-size_1-of-2 slds-medium-size_2-of-12 slds-m-bottom_small">
+                                    <div class="slds-box slds-box_x-small slds-text-align_center slds-theme_default">
+                                        <div class="slds-text-title_caps slds-truncate">{stage.stageName}</div>
+                                        <div class="slds-text-heading_medium slds-m-vertical_xx-small"><strong>{stage.count}</strong></div>
+                                        <span class="slds-badge slds-badge_lightest">{stage.percentage}%</span>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </lightning-card>
+            </div>
+
+            <!-- JOB HEALTH & MATCH COVERAGE TABLE -->
+            <div class="slds-m-bottom_medium">
+                <lightning-card title="Job Health & Candidate Match Matrix" icon-name="standard:job_position">
+                    <div class="slds-p-horizontal_medium slds-p-bottom_medium">
+                        <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_small">
+                            Comprehensive job-level visibility into required headcount, application volume, candidate pool size, and verified match score distribution. Click a Job Title to view the job record or use the actions to drill down into Match Intelligence.
+                        </p>
+                        <div class="slds-scrollable_x">
+                            <table class="slds-table slds-table_cell-buffer slds-table_bordered custom-table">
+                                <thead>
+                                    <tr class="slds-line-height_reset">
+                                        <th scope="col"><div class="slds-truncate">Job Requisition</div></th>
+                                        <th scope="col"><div class="slds-truncate">Department</div></th>
+                                        <th scope="col"><div class="slds-truncate">Headcount</div></th>
+                                        <th scope="col"><div class="slds-truncate">Apps</div></th>
+                                        <th scope="col"><div class="slds-truncate">Candidates</div></th>
+                                        <th scope="col"><div class="slds-truncate">Avg Match Score</div></th>
+                                        <th scope="col"><div class="slds-truncate">Highest Match Score</div></th>
+                                        <th scope="col"><div class="slds-truncate">&gt;= 80% (Strong)</div></th>
+                                        <th scope="col"><div class="slds-truncate">&gt;= 65% (Good)</div></th>
+                                        <th scope="col"><div class="slds-truncate">&gt;= 50% (Mod)</div></th>
+                                        <th scope="col"><div class="slds-truncate">Actions</div></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template for:each={jobHealthRows} for:item="row">
+                                        <tr key={row.jobId}>
+                                            <td>
+                                                <a href="javascript:void(0);" data-id={row.jobId} onclick={navigateToJobRecord}>
+                                                    <strong>{row.jobTitle}</strong>
+                                                </a>
+                                                <div class="slds-text-color_weak slds-text-body_small">{row.jobCode}</div>
+                                            </td>
+                                            <td><div class="slds-truncate">{row.department}</div></td>
+                                            <td><div class="slds-truncate"><strong>{row.requiredHeadcount}</strong></div></td>
+                                            <td><div class="slds-truncate">{row.applicationCount}</div></td>
+                                            <td><div class="slds-truncate">{row.candidateCount}</div></td>
+                                            <td>
+                                                <span class={row.scoreBadgeClass}>{row.scoreDisplay}</span>
+                                            </td>
+                                            <td>
+                                                <div class="slds-truncate">{row.highestScoreDisplay}</div>
+                                            </td>
+                                            <td><div class="slds-truncate"><span class="slds-badge badge-score-strong">{row.strongMatchCount}</span></div></td>
+                                            <td><div class="slds-truncate"><span class="slds-badge badge-score-good">{row.goodMatchCount}</span></div></td>
+                                            <td><div class="slds-truncate"><span class="slds-badge badge-score-moderate">{row.moderateMatchCount}</span></div></td>
+                                            <td>
+                                                <lightning-button-group>
+                                                    <lightning-button label="Match" size="x-small" icon-name="custom:custom62" onclick={handleOpenMatchIntelligence}></lightning-button>
+                                                    <lightning-button label="Compare" size="x-small" icon-name="utility:multi_picklist" onclick={handleOpenCandidateComparison}></lightning-button>
+                                                </lightning-button-group>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </lightning-card>
+            </div>
+
+            <!-- MATCH COVERAGE & SKILL GAP INTELLIGENCE GRID -->
+            <div class="slds-grid slds-gutters slds-wrap slds-m-bottom_medium">
+                <!-- Match Coverage Summary -->
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-m-bottom_small">
+                    <lightning-card title="Match Coverage & Classification Tiers" icon-name="custom:custom62">
+                        <div class="slds-p-horizontal_medium slds-p-bottom_medium">
+                            <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_small">
+                                Evaluated across {formattedTotalEvaluations} total candidate-job pairs using objective competency weights.
+                            </p>
+                            <div class="slds-grid slds-gutters slds-m-bottom_medium">
+                                <div class="slds-col slds-size_3-of-12 slds-text-align_center">
+                                    <div class="slds-box slds-box_x-small badge-score-strong">
+                                        <div class="slds-text-heading_medium"><strong>{data.matchCoverage.totalStrongMatches}</strong></div>
+                                        <div class="slds-text-body_small">&gt;= 80% Strong</div>
+                                    </div>
+                                </div>
+                                <div class="slds-col slds-size_3-of-12 slds-text-align_center">
+                                    <div class="slds-box slds-box_x-small badge-score-good">
+                                        <div class="slds-text-heading_medium"><strong>{data.matchCoverage.totalGoodMatches}</strong></div>
+                                        <div class="slds-text-body_small">&gt;= 65% Good</div>
+                                    </div>
+                                </div>
+                                <div class="slds-col slds-size_3-of-12 slds-text-align_center">
+                                    <div class="slds-box slds-box_x-small badge-score-moderate">
+                                        <div class="slds-text-heading_medium"><strong>{data.matchCoverage.totalModerateMatches}</strong></div>
+                                        <div class="slds-text-body_small">&gt;= 50% Moderate</div>
+                                    </div>
+                                </div>
+                                <div class="slds-col slds-size_3-of-12 slds-text-align_center">
+                                    <div class="slds-box slds-box_x-small badge-score-low">
+                                        <div class="slds-text-heading_medium"><strong>{data.matchCoverage.totalLowMatches}</strong></div>
+                                        <div class="slds-text-body_small">&lt; 50% Low</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Strongest vs Weakest Coverage Roles -->
+                            <div class="slds-grid slds-gutters">
+                                <div class="slds-col slds-size_6-of-12">
+                                    <h4 class="section-title slds-m-bottom_xx-small">Strongest Coverage Roles</h4>
+                                    <ul class="slds-has-dividers_bottom-space">
+                                        <template for:each={data.matchCoverage.strongestJobs} for:item="sj">
+                                            <li key={sj.jobId} class="slds-item slds-p-vertical_xx-small">
+                                                <div class="slds-grid slds-grid_align-spread">
+                                                    <span><strong>{sj.jobTitle}</strong></span>
+                                                    <span class="slds-badge badge-score-good">{sj.averageScore}% avg</span>
+                                                </div>
+                                            </li>
+                                        </template>
+                                    </ul>
+                                </div>
+                                <div class="slds-col slds-size_6-of-12">
+                                    <h4 class="section-title slds-m-bottom_xx-small">Weakest Coverage Roles</h4>
+                                    <ul class="slds-has-dividers_bottom-space">
+                                        <template for:each={data.matchCoverage.weakestJobs} for:item="wj">
+                                            <li key={wj.jobId} class="slds-item slds-p-vertical_xx-small">
+                                                <div class="slds-grid slds-grid_align-spread">
+                                                    <span><strong>{wj.jobTitle}</strong></span>
+                                                    <span class="slds-badge badge-score-low">{wj.averageScore}% avg</span>
+                                                </div>
+                                            </li>
+                                        </template>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </lightning-card>
+                </div>
+
+                <!-- Skill Gap Intelligence -->
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_6-of-12 slds-m-bottom_small">
+                    <lightning-card title="Skill Gap Intelligence" icon-name="standard:skill_requirement">
+                        <div class="slds-p-horizontal_medium slds-p-bottom_medium">
+                            <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_small">
+                                Frequently missing competencies identified across candidate match evaluations for active job requisitions.
+                            </p>
+                            <div class="slds-scrollable_y" style="max-height: 280px;">
+                                <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                    <thead>
+                                        <tr class="slds-line-height_reset">
+                                            <th scope="col"><div class="slds-truncate">Missing Competency</div></th>
+                                            <th scope="col"><div class="slds-truncate">Candidate Matches With Gap</div></th>
+                                            <th scope="col"><div class="slds-truncate">Relevant Job Requisitions</div></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template for:each={data.skillGaps} for:item="sg">
+                                            <tr key={sg.skillName}>
+                                                <td><strong>{sg.skillName}</strong></td>
+                                                <td><span class="slds-badge badge-score-low">{sg.gapCount} evaluations</span></td>
+                                                <td>
+                                                    <template for:each={sg.relevantJobTitles} for:item="jobTitle">
+                                                        <span key={jobTitle} class="slds-badge slds-badge_lightest slds-m-right_xx-small slds-m-bottom_xx-small">
+                                                            {jobTitle}
+                                                        </span>
+                                                    </template>
+                                                </td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </lightning-card>
+                </div>
+            </div>
+
+            <!-- INTERVIEW BOTTLENECKS SECTION -->
+            <div class="slds-m-bottom_medium">
+                <lightning-card title="Interview Pipeline & Operational Bottlenecks" icon-name="standard:service_appointment">
+                    <div class="slds-p-horizontal_medium slds-p-bottom_medium">
+                        <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_small">
+                            Operational status of interview rounds. Upcoming interviews are filtered using live DateTime semantics (Interview_Date &gt;= Current Timestamp).
+                        </p>
+                        <!-- Summary metrics -->
+                        <div class="slds-grid slds-gutters slds-m-bottom_medium">
+                            <div class="slds-col slds-size_1-of-5 slds-text-align_center">
+                                <div class="slds-box slds-box_x-small">
+                                    <div class="slds-text-heading_medium"><strong>{data.interviewBottlenecks.upcomingCount}</strong></div>
+                                    <div class="slds-text-body_small">Upcoming (Future)</div>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-size_1-of-5 slds-text-align_center">
+                                <div class="slds-box slds-box_x-small">
+                                    <div class="slds-text-heading_medium"><strong>{data.interviewBottlenecks.scheduledCount}</strong></div>
+                                    <div class="slds-text-body_small">Total Scheduled</div>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-size_1-of-5 slds-text-align_center">
+                                <div class="slds-box slds-box_x-small">
+                                    <div class="slds-text-heading_medium"><strong>{data.interviewBottlenecks.completedCount}</strong></div>
+                                    <div class="slds-text-body_small">Completed</div>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-size_1-of-5 slds-text-align_center">
+                                <div class="slds-box slds-box_x-small badge-score-low">
+                                    <div class="slds-text-heading_medium"><strong>{data.interviewBottlenecks.attentionCount}</strong></div>
+                                    <div class="slds-text-body_small">Past Due / Attention</div>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-size_1-of-5 slds-text-align_center">
+                                <div class="slds-box slds-box_x-small">
+                                    <div class="slds-text-heading_medium"><strong>{data.interviewBottlenecks.interviewStageApplications}</strong></div>
+                                    <div class="slds-text-body_small">Apps at Interview Stage</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Overdue Interviews table (if any) -->
+                        <template if:true={data.interviewBottlenecks.attentionCount}>
+                            <h4 class="section-title slds-text-color_error slds-m-bottom_x-small">
+                                <lightning-icon icon-name="utility:warning" size="x-small" variant="error" class="slds-m-right_xx-small"></lightning-icon>
+                                Scheduled Interviews Past Scheduled Date/Time (Action Required)
+                            </h4>
+                            <div class="slds-scrollable_x slds-m-bottom_medium">
+                                <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                    <thead>
+                                        <tr class="slds-line-height_reset">
+                                            <th scope="col"><div class="slds-truncate">Candidate</div></th>
+                                            <th scope="col"><div class="slds-truncate">Job Requisition</div></th>
+                                            <th scope="col"><div class="slds-truncate">Scheduled Date/Time</div></th>
+                                            <th scope="col"><div class="slds-truncate">Status</div></th>
+                                            <th scope="col"><div class="slds-truncate">Round / Type</div></th>
+                                            <th scope="col"><div class="slds-truncate">Action</div></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template for:each={data.interviewBottlenecks.attentionInterviewsList} for:item="iv">
+                                            <tr key={iv.interviewId}>
+                                                <td><strong>{iv.candidateName}</strong></td>
+                                                <td>{iv.jobTitle}</td>
+                                                <td><lightning-formatted-date-time value={iv.interviewDate} year="numeric" month="short" day="2-digit" hour="2-digit" minute="2-digit"></lightning-formatted-date-time></td>
+                                                <td><span class="slds-badge badge-score-low">{iv.interviewStatus} (Overdue)</span></td>
+                                                <td>{iv.interviewRound}</td>
+                                                <td>
+                                                    <lightning-button label="View Interview" size="x-small" data-id={iv.interviewId} data-target="Interview" onclick={handleAttentionAction}></lightning-button>
+                                                </td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </template>
+
+                        <!-- Job interview activity -->
+                        <h4 class="section-title slds-m-bottom_x-small">Job Requisition Interview Activity</h4>
+                        <div class="slds-grid slds-gutters slds-wrap">
+                            <template for:each={data.interviewBottlenecks.jobsWithActivity} for:item="jAct">
+                                <div key={jAct.jobId} class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12 slds-m-bottom_small">
+                                    <div class="slds-box slds-box_x-small slds-theme_default">
+                                        <div class="slds-truncate"><strong>{jAct.jobTitle}</strong></div>
+                                        <div class="slds-grid slds-grid_align-spread slds-m-top_xx-small">
+                                            <span class="slds-text-body_small">Scheduled: <strong>{jAct.scheduledCount}</strong></span>
+                                            <span class="slds-text-body_small">Completed: <strong>{jAct.completedCount}</strong></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </lightning-card>
+            </div>
+        </template>
+    </div>
+</template>

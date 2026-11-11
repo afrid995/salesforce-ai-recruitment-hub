@@ -1,0 +1,526 @@
+<template>
+    <lightning-card title="Recruiter Action Center" icon-name="custom:custom26">
+        <!-- Header Actions -->
+        <div slot="actions">
+            <lightning-button-group>
+                <lightning-button
+                    label="Sync Alerts Now"
+                    icon-name="utility:sync"
+                    onclick={handleSyncNow}
+                    disabled={isLoading}>
+                </lightning-button>
+                <lightning-button
+                    label="Refresh"
+                    icon-name="utility:refresh"
+                    onclick={handleRefresh}
+                    disabled={isLoading}>
+                </lightning-button>
+                <lightning-button
+                    label="Ask Agentforce"
+                    icon-name="utility:chat"
+                    variant="brand"
+                    onclick={handleOpenCopilot}>
+                </lightning-button>
+            </lightning-button-group>
+        </div>
+
+        <div class="slds-p-around_medium">
+            <!-- Responsible AI Banner -->
+            <div class="slds-notify slds-notify_alert slds-theme_info slds-m-bottom_medium slds-p-around_x-small" role="alert">
+                <lightning-icon icon-name="utility:shield" size="x-small" variant="inverse" class="slds-m-right_x-small"></lightning-icon>
+                <h2>{data.responsibleAiNotice}</h2>
+            </div>
+
+            <!-- Error Notification -->
+            <template if:true={errorMessage}>
+                <div class="slds-notify slds-notify_alert slds-theme_error slds-m-bottom_medium" role="alert">
+                    <lightning-icon icon-name="utility:error" size="x-small" variant="inverse" class="slds-m-right_x-small"></lightning-icon>
+                    <h2>{errorMessage}</h2>
+                </div>
+            </template>
+
+            <!-- Loading Spinner -->
+            <template if:true={isLoading}>
+                <div class="slds-is-relative slds-p-around_large spinner-container">
+                    <lightning-spinner alternative-text="Loading Recruiter Action Center..." size="medium"></lightning-spinner>
+                </div>
+            </template>
+
+            <!-- Summary KPI Metric Cards -->
+            <div class="slds-grid slds-wrap slds-gutters slds-m-bottom_medium">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-5">
+                    <div class="kpi-card kpi-high slds-p-around_small slds-text-align_center">
+                        <div class="kpi-label">High Attention</div>
+                        <div class="kpi-value">{data.highAttentionCount}</div>
+                        <div class="kpi-sub">Immediate action required</div>
+                    </div>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-5">
+                    <div class="kpi-card kpi-review slds-p-around_small slds-text-align_center">
+                        <div class="kpi-label">Requires Review</div>
+                        <div class="kpi-value">{data.requiresReviewCount}</div>
+                        <div class="kpi-sub">Operational check recommended</div>
+                    </div>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-5">
+                    <div class="kpi-card kpi-info slds-p-around_small slds-text-align_center">
+                        <div class="kpi-label">Informational</div>
+                        <div class="kpi-value">{data.informationalCount}</div>
+                        <div class="kpi-sub">Pipeline context updates</div>
+                    </div>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-5">
+                    <div class="kpi-card kpi-ack slds-p-around_small slds-text-align_center">
+                        <div class="kpi-label">Acknowledged</div>
+                        <div class="kpi-value">{data.acknowledgedCount}</div>
+                        <div class="kpi-sub">Reviewed by human recruiter</div>
+                    </div>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-5">
+                    <div class="kpi-card kpi-res slds-p-around_small slds-text-align_center">
+                        <div class="kpi-label">Resolved</div>
+                        <div class="kpi-value">{data.resolvedCount}</div>
+                        <div class="kpi-sub">Condition cleared</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Multi-Dimensional Filter Bar -->
+            <div class="filter-panel slds-box slds-box_small slds-m-bottom_medium slds-theme_shade">
+                <div class="slds-grid slds-wrap slds-gutters slds-grid_vertical-align-center">
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+                        <lightning-combobox
+                            name="jobFilter"
+                            label="Filter by Job Requisition"
+                            value={selectedJobId}
+                            options={jobOptions}
+                            onchange={handleJobChange}>
+                        </lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+                        <lightning-combobox
+                            name="statusFilter"
+                            label="Filter by Status"
+                            value={selectedStatus}
+                            options={statusOptions}
+                            onchange={handleStatusChange}>
+                        </lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+                        <lightning-combobox
+                            name="severityFilter"
+                            label="Filter by Severity"
+                            value={selectedSeverity}
+                            options={severityOptions}
+                            onchange={handleSeverityChange}>
+                        </lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12 slds-m-top_small">
+                        <lightning-button
+                            label="Clear Filters"
+                            icon-name="utility:clear"
+                            onclick={handleClearFilters}
+                            class="slds-m-top_large">
+                        </lightning-button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category Navigation Tabs -->
+            <div class="slds-tabs_default slds-m-bottom_medium">
+                <ul class="slds-tabs_default__nav" role="tablist">
+                    <template for:each={categoryTabs} for:item="tab">
+                        <li key={tab.id} class={tab.tabClass} role="presentation">
+                            <a class="slds-tabs_default__link" href="javascript:void(0);" role="tab" data-tab={tab.id} onclick={handleCategoryTabClick}>
+                                {tab.label}
+                                <span class="slds-badge slds-m-left_xx-small">{tab.count}</span>
+                            </a>
+                        </li>
+                    </template>
+                </ul>
+            </div>
+
+            <!-- Empty State -->
+            <template if:true={hasNoAlerts}>
+                <div class="slds-illustration slds-illustration_small slds-p-around_large slds-text-align_center">
+                    <div class="slds-text-heading_medium slds-m-bottom_x-small">No Alerts Found</div>
+                    <div class="slds-text-body_regular slds-text-color_weak slds-m-bottom_medium">
+                        All recruitment operations for the selected filters are in healthy parameters.
+                    </div>
+                    <lightning-button label="Sync Live Records" icon-name="utility:sync" onclick={handleSyncNow}></lightning-button>
+                </div>
+            </template>
+
+            <!-- Grouped Alerts Display -->
+            <template if:false={hasNoAlerts}>
+                <!-- HIGH ATTENTION SECTION -->
+                <template if:true={hasHighAttentionAlerts}>
+                    <div class="section-header slds-m-top_small slds-m-bottom_small">
+                        <div class="slds-grid slds-grid_vertical-align-center">
+                            <lightning-icon icon-name="utility:warning" size="small" variant="error" class="slds-m-right_x-small"></lightning-icon>
+                            <h3 class="slds-text-heading_small slds-text-color_error font-bold">
+                                HIGH ATTENTION ALERTS ({highAttentionList.length})
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="slds-grid slds-wrap slds-gutters">
+                        <template for:each={highAttentionList} for:item="alt">
+                            <div key={alt.alertId} class="slds-col slds-size_1-of-1 slds-m-bottom_small">
+                                <div class={alt.cardClass}>
+                                    <div class="slds-grid slds-wrap slds-grid_vertical-align-center slds-m-bottom_x-small">
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_8-of-12">
+                                            <span class={alt.badgeClass}>{alt.severity}</span>
+                                            <span class={alt.statusBadgeClass}>{alt.status}</span>
+                                            <span class="slds-badge slds-badge_lightest slds-m-right_x-small">{alt.alertType}</span>
+                                            <span class="font-bold slds-text-heading_small">{alt.title}</span>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12 slds-text-align_right slds-text-color_weak slds-text-body_small">
+                                            {alt.formattedDate}
+                                        </div>
+                                    </div>
+
+                                    <!-- Requisition & Candidate Reference -->
+                                    <div class="slds-grid slds-wrap slds-m-bottom_x-small slds-text-body_small">
+                                        <template if:true={alt.jobTitle}>
+                                            <div class="slds-m-right_medium">
+                                                <strong>Requisition:</strong>
+                                                <a href="javascript:void(0);" data-id={alt.jobId} onclick={handleNavigateJob} class="slds-m-left_xx-small">
+                                                    {alt.jobTitle}
+                                                </a>
+                                            </div>
+                                        </template>
+                                        <template if:true={alt.candidateName}>
+                                            <div class="slds-m-right_medium">
+                                                <strong>Candidate:</strong>
+                                                <span class="slds-m-left_xx-small">{alt.candidateName}</span>
+                                            </div>
+                                        </template>
+                                    </div>
+
+                                    <!-- Evidence & Explanation -->
+                                    <div class="evidence-box slds-box slds-box_xx-small slds-m-bottom_x-small">
+                                        <div class="slds-text-title_caps slds-text-color_weak">Observed Evidence:</div>
+                                        <div class="slds-text-body_regular font-medium">{alt.evidence}</div>
+                                    </div>
+                                    <div class="slds-text-body_small slds-text-color_weak slds-m-bottom_small">
+                                        {alt.explanation}
+                                    </div>
+
+                                    <!-- Acknowledged Banner -->
+                                    <template if:true={alt.isAcknowledged}>
+                                        <div class="ack-banner slds-box slds-box_xx-small slds-m-bottom_small slds-theme_shade">
+                                            <lightning-icon icon-name="utility:check" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                            <strong>Acknowledged by {alt.acknowledgedByName} on {alt.formattedAckDate}:</strong>
+                                            <span class="slds-m-left_xx-small">{alt.acknowledgedNotes}</span>
+                                        </div>
+                                    </template>
+
+                                    <!-- Action Buttons -->
+                                    <div class="slds-grid slds-wrap slds-grid_vertical-align-center">
+                                        <template if:true={alt.canReschedule}>
+                                            <lightning-button
+                                                label="Reschedule Interview"
+                                                variant="brand"
+                                                icon-name="utility:event"
+                                                data-id={alt.interviewId}
+                                                onclick={handleOpenRescheduleModal}
+                                                class="slds-m-right_x-small slds-m-bottom_xx-small">
+                                            </lightning-button>
+                                        </template>
+                                        <template if:true={alt.jobId}>
+                                            <lightning-button
+                                                label="Open Job"
+                                                variant="neutral"
+                                                icon-name="utility:open"
+                                                data-id={alt.jobId}
+                                                onclick={handleNavigateJob}
+                                                class="slds-m-right_x-small slds-m-bottom_xx-small">
+                                            </lightning-button>
+                                            <lightning-button
+                                                label="View Match Intelligence"
+                                                variant="neutral"
+                                                icon-name="utility:graph"
+                                                onclick={handleNavigateMatch}
+                                                class="slds-m-right_x-small slds-m-bottom_xx-small">
+                                            </lightning-button>
+                                            <lightning-button
+                                                label="Compare Candidates"
+                                                variant="neutral"
+                                                icon-name="utility:people"
+                                                onclick={handleNavigateCompare}
+                                                class="slds-m-right_x-small slds-m-bottom_xx-small">
+                                            </lightning-button>
+                                        </template>
+                                        <template if:true={alt.isActive}>
+                                            <lightning-button
+                                                label="Acknowledge Alert"
+                                                variant="outline-brand"
+                                                icon-name="utility:check"
+                                                data-id={alt.alertId}
+                                                data-title={alt.title}
+                                                onclick={handleOpenAcknowledgeModal}
+                                                class="slds-m-right_x-small slds-m-bottom_xx-small">
+                                            </lightning-button>
+                                        </template>
+                                        <lightning-button
+                                            label="Ask Agentforce"
+                                            variant="base"
+                                            icon-name="utility:chat"
+                                            onclick={handleOpenCopilot}
+                                            class="slds-m-bottom_xx-small">
+                                        </lightning-button>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+
+                <!-- REQUIRES RECRUITER REVIEW SECTION -->
+                <template if:true={hasReviewAlerts}>
+                    <div class="section-header slds-m-top_medium slds-m-bottom_small">
+                        <div class="slds-grid slds-grid_vertical-align-center">
+                            <lightning-icon icon-name="utility:priority" size="small" variant="warning" class="slds-m-right_x-small"></lightning-icon>
+                            <h3 class="slds-text-heading_small slds-text-color_warning font-bold">
+                                REQUIRES RECRUITER REVIEW ({reviewList.length})
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="slds-grid slds-wrap slds-gutters">
+                        <template for:each={reviewList} for:item="alt">
+                            <div key={alt.alertId} class="slds-col slds-size_1-of-1 slds-m-bottom_small">
+                                <div class={alt.cardClass}>
+                                    <div class="slds-grid slds-wrap slds-grid_vertical-align-center slds-m-bottom_x-small">
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_8-of-12">
+                                            <span class={alt.badgeClass}>{alt.severity}</span>
+                                            <span class={alt.statusBadgeClass}>{alt.status}</span>
+                                            <span class="slds-badge slds-badge_lightest slds-m-right_x-small">{alt.alertType}</span>
+                                            <span class="font-bold slds-text-heading_small">{alt.title}</span>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12 slds-text-align_right slds-text-color_weak slds-text-body_small">
+                                            {alt.formattedDate}
+                                        </div>
+                                    </div>
+
+                                    <template if:true={alt.jobTitle}>
+                                        <div class="slds-m-bottom_x-small slds-text-body_small">
+                                            <strong>Requisition:</strong>
+                                            <a href="javascript:void(0);" data-id={alt.jobId} onclick={handleNavigateJob} class="slds-m-left_xx-small">
+                                                {alt.jobTitle}
+                                            </a>
+                                        </div>
+                                    </template>
+
+                                    <div class="evidence-box slds-box slds-box_xx-small slds-m-bottom_x-small">
+                                        <div class="slds-text-title_caps slds-text-color_weak">Observed Evidence:</div>
+                                        <div class="slds-text-body_regular font-medium">{alt.evidence}</div>
+                                    </div>
+                                    <div class="slds-text-body_small slds-text-color_weak slds-m-bottom_small">
+                                        {alt.explanation}
+                                    </div>
+
+                                    <template if:true={alt.isAcknowledged}>
+                                        <div class="ack-banner slds-box slds-box_xx-small slds-m-bottom_small slds-theme_shade">
+                                            <lightning-icon icon-name="utility:check" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                            <strong>Acknowledged by {alt.acknowledgedByName} on {alt.formattedAckDate}:</strong>
+                                            <span class="slds-m-left_xx-small">{alt.acknowledgedNotes}</span>
+                                        </div>
+                                    </template>
+
+                                    <!-- Action Buttons -->
+                                    <div class="slds-grid slds-wrap slds-grid_vertical-align-center">
+                                        <template if:true={alt.jobId}>
+                                            <lightning-button
+                                                label="Open Job"
+                                                variant="neutral"
+                                                icon-name="utility:open"
+                                                data-id={alt.jobId}
+                                                onclick={handleNavigateJob}
+                                                class="slds-m-right_x-small slds-m-bottom_xx-small">
+                                            </lightning-button>
+                                            <lightning-button
+                                                label="View Match Intelligence"
+                                                variant="neutral"
+                                                icon-name="utility:graph"
+                                                onclick={handleNavigateMatch}
+                                                class="slds-m-right_x-small slds-m-bottom_xx-small">
+                                            </lightning-button>
+                                        </template>
+                                        <template if:true={alt.isActive}>
+                                            <lightning-button
+                                                label="Acknowledge Alert"
+                                                variant="outline-brand"
+                                                icon-name="utility:check"
+                                                data-id={alt.alertId}
+                                                data-title={alt.title}
+                                                onclick={handleOpenAcknowledgeModal}
+                                                class="slds-m-right_x-small slds-m-bottom_xx-small">
+                                            </lightning-button>
+                                        </template>
+                                        <lightning-button
+                                            label="Ask Agentforce"
+                                            variant="base"
+                                            icon-name="utility:chat"
+                                            onclick={handleOpenCopilot}
+                                            class="slds-m-bottom_xx-small">
+                                        </lightning-button>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+
+                <!-- INFORMATIONAL / RESOLVED SECTION -->
+                <template if:true={hasInfoAlerts}>
+                    <div class="section-header slds-m-top_medium slds-m-bottom_small">
+                        <div class="slds-grid slds-grid_vertical-align-center">
+                            <lightning-icon icon-name="utility:info_alt" size="small" class="slds-m-right_x-small"></lightning-icon>
+                            <h3 class="slds-text-heading_small font-bold">
+                                INFORMATIONAL & RESOLVED NOTICES ({infoList.length})
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="slds-grid slds-wrap slds-gutters">
+                        <template for:each={infoList} for:item="alt">
+                            <div key={alt.alertId} class="slds-col slds-size_1-of-1 slds-m-bottom_small">
+                                <div class={alt.cardClass}>
+                                    <div class="slds-grid slds-wrap slds-grid_vertical-align-center slds-m-bottom_x-small">
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_8-of-12">
+                                            <span class={alt.badgeClass}>{alt.severity}</span>
+                                            <span class={alt.statusBadgeClass}>{alt.status}</span>
+                                            <span class="slds-badge slds-badge_lightest slds-m-right_x-small">{alt.alertType}</span>
+                                            <span class="font-bold">{alt.title}</span>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12 slds-text-align_right slds-text-color_weak slds-text-body_small">
+                                            {alt.formattedDate}
+                                        </div>
+                                    </div>
+                                    <div class="slds-text-body_small slds-m-bottom_x-small">
+                                        {alt.evidence}
+                                    </div>
+                                    <template if:true={alt.jobId}>
+                                        <lightning-button
+                                            label="Open Job"
+                                            variant="neutral"
+                                            icon-name="utility:open"
+                                            data-id={alt.jobId}
+                                            onclick={handleNavigateJob}
+                                            class="slds-m-right_x-small">
+                                        </lightning-button>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+            </template>
+        </div>
+    </lightning-card>
+
+    <!-- RESCHEDULE INTERVIEW MODAL -->
+    <template if:true={showRescheduleModal}>
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_small" aria-modal="true">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={handleCloseRescheduleModal}>
+                        <lightning-icon icon-name="utility:close" size="small" variant="inverse"></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 class="slds-modal__title slds-hyphenate">Human-in-the-Loop Interview Reschedule</h2>
+                </header>
+
+                <div class="slds-modal__content slds-p-around_medium">
+                    <template if:true={modalLoading}>
+                        <lightning-spinner alternative-text="Loading interview..." size="small"></lightning-spinner>
+                    </template>
+
+                    <div class="slds-box slds-box_x-small slds-theme_shade slds-m-bottom_medium">
+                        <div class="slds-grid slds-wrap slds-gutters">
+                            <div class="slds-col slds-size_1-of-2 slds-m-bottom_x-small">
+                                <strong>Candidate:</strong> {currentInterview.candidateName}
+                            </div>
+                            <div class="slds-col slds-size_1-of-2 slds-m-bottom_x-small">
+                                <strong>Job Requisition:</strong> {currentInterview.jobTitle}
+                            </div>
+                            <div class="slds-col slds-size_1-of-2">
+                                <strong>Current Date/Time:</strong> {currentInterview.formattedDate}
+                            </div>
+                            <div class="slds-col slds-size_1-of-2">
+                                <strong>Type / Status:</strong> {currentInterview.interviewType} ({currentInterview.interviewStatus})
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slds-notify slds-notify_alert slds-theme_warning slds-m-bottom_medium" role="alert">
+                        <lightning-icon icon-name="utility:warning" size="x-small" class="slds-m-right_x-small"></lightning-icon>
+                        <h2>Confirmation Required: This action will update the Salesforce Interview record. Automated rescheduling is disabled.</h2>
+                    </div>
+
+                    <lightning-input
+                        type="datetime"
+                        name="newInterviewDateTime"
+                        label="New Scheduled Interview Date & Time"
+                        required
+                        value={newRescheduleDateTime}
+                        onchange={handleRescheduleDateChange}
+                        class="slds-m-bottom_medium">
+                    </lightning-input>
+
+                    <lightning-textarea
+                        name="rescheduleNotes"
+                        label="Recruiter Scheduling Notes (Optional)"
+                        value={rescheduleNotes}
+                        onchange={handleRescheduleNotesChange}
+                        placeholder="Add reason for reschedule, candidate confirmation details, or updated interview format...">
+                    </lightning-textarea>
+                </div>
+
+                <footer class="slds-modal__footer">
+                    <lightning-button label="Cancel" onclick={handleCloseRescheduleModal} class="slds-m-right_x-small"></lightning-button>
+                    <lightning-button label="Confirm Reschedule" variant="brand" icon-name="utility:check" onclick={handleConfirmReschedule} disabled={isRescheduleDisabled}></lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+    </template>
+
+    <!-- ACKNOWLEDGE ALERT MODAL -->
+    <template if:true={showAckModal}>
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_small" aria-modal="true">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={handleCloseAckModal}>
+                        <lightning-icon icon-name="utility:close" size="small" variant="inverse"></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 class="slds-modal__title slds-hyphenate">Acknowledge Recruitment Alert</h2>
+                </header>
+
+                <div class="slds-modal__content slds-p-around_medium">
+                    <div class="slds-text-body_regular slds-m-bottom_medium">
+                        You are acknowledging alert: <strong>{ackAlertTitle}</strong>.
+                    </div>
+                    <div class="slds-text-body_small slds-text-color_weak slds-m-bottom_medium">
+                        Acknowledging this alert preserves the observation and records your review without altering candidate or application data.
+                    </div>
+
+                    <lightning-textarea
+                        name="ackNotes"
+                        label="Recruiter Follow-up Notes"
+                        required
+                        value={ackNotes}
+                        onchange={handleAckNotesChange}
+                        placeholder="e.g., Reviewed with hiring manager; sourcing additional candidates from talent pool next week.">
+                    </lightning-textarea>
+                </div>
+
+                <footer class="slds-modal__footer">
+                    <lightning-button label="Cancel" onclick={handleCloseAckModal} class="slds-m-right_x-small"></lightning-button>
+                    <lightning-button label="Confirm Acknowledgement" variant="brand" icon-name="utility:check" onclick={handleConfirmAcknowledge} disabled={isAckDisabled}></lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+    </template>
+</template>

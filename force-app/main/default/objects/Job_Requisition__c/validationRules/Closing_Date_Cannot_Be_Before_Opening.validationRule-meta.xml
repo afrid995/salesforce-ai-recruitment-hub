@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Closing_Date_Cannot_Be_Before_Opening</fullName>
+    <active>true</active>
+    <description>Closing Date cannot be earlier than Opening Date.</description>
+    <errorConditionFormula>NOT(ISBLANK(Opening_Date__c)) &amp;&amp; NOT(ISBLANK(Closing_Date__c)) &amp;&amp; Closing_Date__c &lt; Opening_Date__c</errorConditionFormula>
+    <errorDisplayField>Closing_Date__c</errorDisplayField>
+    <errorMessage>Closing Date cannot be earlier than Opening Date.</errorMessage>
+</ValidationRule>

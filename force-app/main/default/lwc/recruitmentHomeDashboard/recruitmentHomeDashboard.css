@@ -1,0 +1,188 @@
+/* AI Recruitment Hub Banner */
+.hub-header-banner {
+    background: linear-gradient(135deg, #0A2540 0%, #153966 50%, #0B5CAB 100%);
+    border-radius: 8px;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(10, 37, 64, 0.15);
+}
+
+.hub-tagline {
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    color: #A0C4E2;
+}
+
+.hub-title {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.hub-description {
+    color: #E1EEFA;
+    font-size: 0.95rem;
+}
+
+.hub-logo-icon {
+    border-radius: 8px;
+    padding: 6px;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.refresh-btn {
+    --slds-c-button-color-background: rgba(255, 255, 255, 0.2);
+}
+
+/* Quick Actions Card */
+.quick-actions-card {
+    border-radius: 8px;
+    background: #FAFAFB;
+    border: 1px solid #E5E5E7;
+}
+
+/* KPI Cards */
+.kpi-card {
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    border: 1px solid #E5E5E7;
+    background: #ffffff;
+    min-height: 100px;
+}
+
+.kpi-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+    border-color: #0B5CAB;
+}
+
+.kpi-icon-container {
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.kpi-blue { background: #EBF4FC; }
+.kpi-purple { background: #F3EAFD; }
+.kpi-orange { background: #FEF3EB; }
+.kpi-teal { background: #E6F7F5; }
+.kpi-green { background: #EDF7EE; }
+
+.kpi-value {
+    font-size: 1.85rem;
+    font-weight: 700;
+    line-height: 1.1;
+    color: #181818;
+}
+
+.kpi-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #5C5C5C;
+    margin-top: 2px;
+}
+
+.kpi-sub-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+/* Report Shortcuts */
+.report-shortcuts-card {
+    border-radius: 8px;
+    background: #FFFFFF;
+    border: 1px solid #E5E5E7;
+}
+
+.report-icon-wrapper {
+    background: #EBF4FC;
+    border-radius: 6px;
+    padding: 6px;
+    display: inline-block;
+}
+
+.report-tile {
+    border: 1px solid #DFE6ED;
+    border-radius: 6px;
+    background: #FAFAFB;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    height: 100%;
+}
+
+.report-tile:hover {
+    border-color: #0B5CAB;
+    background: #F4F8FC;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(11, 92, 171, 0.1);
+}
+
+.report-tile-title {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #0B5CAB;
+}
+
+.report-tile-desc {
+    font-size: 0.72rem;
+    color: #706e6b;
+    margin-top: 1px;
+}
+
+/* AI Assistant Panel */
+.ai-assistant-panel {
+    border-radius: 8px;
+    background: linear-gradient(180deg, #F9FBFE 0%, #FFFFFF 100%);
+    border: 1px solid #D8E5F3;
+}
+
+.ai-sparkle-icon {
+    background: #0B5CAB;
+    border-radius: 50%;
+    padding: 6px;
+    display: inline-block;
+}
+
+.ai-status-badge {
+    background: #EBF4FC;
+    color: #0B5CAB;
+    font-weight: 600;
+    border: 1px solid #CCE2F7;
+}
+
+/* Prompt Chips */
+.prompt-chip {
+    background: #ffffff;
+    border: 1px solid #DFE6ED;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    height: 100%;
+}
+
+.prompt-chip:hover {
+    border-color: #0B5CAB;
+    background: #F4F8FC;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(11, 92, 171, 0.1);
+}
+
+.prompt-text {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #0B5CAB;
+}
+
+.prompt-sub {
+    font-size: 0.72rem;
+    color: #706e6b;
+    margin-top: 2px;
+}
+
+.ai-connection-box {
+    background: #F0F6FC;
+    border-radius: 6px;
+    border-left: 4px solid #0B5CAB;
+}

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Require_Candidate_And_Requisition</fullName>
+    <active>true</active>
+    <description>Candidate and Job Requisition must exist on Job Application.</description>
+    <errorConditionFormula>ISBLANK(Candidate__c) || ISBLANK(Job_Requisition__c)</errorConditionFormula>
+    <errorMessage>Both Candidate and Job Requisition must be specified for a job application.</errorMessage>
+</ValidationRule>

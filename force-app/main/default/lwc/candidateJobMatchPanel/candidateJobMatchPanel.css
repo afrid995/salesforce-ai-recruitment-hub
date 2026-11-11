@@ -1,0 +1,484 @@
+/* Main Container */
+.match-intelligence-container {
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.header-container {
+    border-radius: 6px;
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.header-icon {
+    background-color: #0176d3;
+    border-radius: 6px;
+}
+
+.main-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.header-controls {
+    display: flex;
+    align-items: center;
+}
+
+.job-combobox {
+    min-width: 280px;
+}
+
+.spinner-container {
+    position: relative;
+    height: 300px;
+}
+
+/* Candidate List Card */
+.list-card {
+    background: #ffffff;
+    border-radius: 6px;
+    height: 100%;
+}
+
+.table-scroll-container {
+    max-height: 580px;
+    overflow-y: auto;
+}
+
+.comp-action-bar {
+    background-color: #f1f5f9;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+}
+
+.select-counter {
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+
+.select-col {
+    width: 38px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.candidate-table {
+    border-collapse: separate;
+}
+
+.candidate-row {
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.candidate-row:hover {
+    background-color: #f1f5f9;
+}
+
+.candidate-row.selected-row {
+    background-color: #e0f2fe !important;
+    border-left: 4px solid #0284c7;
+}
+
+.rank-col {
+    width: 40px;
+    text-align: center;
+}
+
+.rank-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+}
+
+.score-col {
+    width: 75px;
+    text-align: right;
+    font-weight: 700;
+}
+
+.action-col {
+    width: 45px;
+    text-align: center;
+}
+
+/* Match Hero Card */
+.match-hero-card {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.hero-candidate-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.2;
+}
+
+.hero-candidate-name a {
+    color: #0f172a;
+    text-decoration: none;
+}
+
+.hero-candidate-name a:hover {
+    color: #0176d3;
+    text-decoration: underline;
+}
+
+.hero-meta-row {
+    margin-top: 4px;
+}
+
+.meta-label {
+    color: #64748b;
+    margin-right: 6px;
+}
+
+.meta-job-link {
+    font-weight: 600;
+    color: #0284c7;
+}
+
+.hero-submeta {
+    color: #475569;
+}
+
+.bullet-sep {
+    margin: 0 8px;
+    color: #cbd5e1;
+}
+
+/* Hero Score Card (Requirement 3: Visual Presentation) */
+.score-callout-col {
+    border-left: 1px solid #e2e8f0;
+}
+
+.score-card {
+    text-align: center;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.score-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    text-transform: uppercase;
+}
+
+.score-number-row {
+    margin: 0.35rem 0;
+}
+
+.score-number {
+    font-size: 2.75rem;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1;
+    font-feature-settings: "tnum";
+}
+
+.score-classification {
+    margin-top: 0.25rem;
+}
+
+.score-badge {
+    font-size: 0.85rem;
+    padding: 0.25rem 0.85rem;
+    border-radius: 20px;
+    font-weight: 700;
+}
+
+.score-guardrail-subtext {
+    font-size: 0.65rem;
+    color: #94a3b8;
+    margin-top: 0.5rem;
+}
+
+/* Factor Breakdown Card */
+.factor-breakdown-card {
+    background: #ffffff;
+    border-radius: 8px;
+}
+
+.factor-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 0.75rem;
+}
+
+.factor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.factor-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #334155;
+}
+
+.factor-score {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.factor-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    color: #64748b;
+}
+
+.contribution-text {
+    font-weight: 600;
+    color: #0284c7;
+}
+
+/* Custom Progress Bar Colors */
+.bar-skill {
+    background-color: #0176d3 !important;
+}
+
+.bar-exp {
+    background-color: #10b981 !important;
+}
+
+.bar-qual {
+    background-color: #8b5cf6 !important;
+}
+
+.bar-loc {
+    background-color: #f59e0b !important;
+}
+
+/* Formula Box */
+.formula-box {
+    background-color: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 6px;
+}
+
+.formula-table-container table th {
+    background-color: #f1f5f9;
+    font-size: 0.75rem;
+    color: #475569;
+}
+
+.total-row {
+    background-color: #f1f5f9;
+}
+
+.overall-total {
+    color: #0284c7;
+    font-size: 1rem;
+}
+
+/* Skill Chips (Matched & Missing) */
+.skill-card {
+    border-radius: 8px;
+    height: 100%;
+}
+
+.card-matched {
+    border-left: 4px solid #10b981;
+}
+
+.card-missing {
+    border-left: 4px solid #f59e0b;
+}
+
+.skill-icon-container {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.icon-success {
+    background-color: #10b981;
+}
+
+.icon-warning {
+    background-color: #f59e0b;
+}
+
+.skill-chips-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-height: 48px;
+    align-items: center;
+}
+
+.skill-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: transform 0.1s ease;
+}
+
+.chip-matched {
+    background-color: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    color: #065f46;
+}
+
+.chip-matched .chip-check {
+    margin-right: 5px;
+    font-weight: 700;
+    color: #10b981;
+}
+
+.chip-missing {
+    background-color: #fffbeb;
+    border: 1px solid #fde68a;
+    color: #92400e;
+}
+
+.chip-missing .chip-bullet {
+    margin-right: 5px;
+    font-weight: 700;
+    color: #f59e0b;
+}
+
+.skill-gap-notice {
+    border-top: 1px solid #f1f5f9;
+    padding-top: 6px;
+}
+
+/* Recruiter Attention Card */
+.attention-card {
+    border-radius: 8px;
+    border-left: 4px solid #0176d3;
+    height: 100%;
+}
+
+.attention-list {
+    margin-left: 1.25rem;
+}
+
+.attention-item {
+    font-size: 0.85rem;
+    color: #334155;
+    margin-bottom: 0.4rem;
+    line-height: 1.4;
+}
+
+/* Explanation Card */
+.explanation-card {
+    border-radius: 8px;
+    height: 100%;
+}
+
+.explanation-content {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 0.75rem;
+    max-height: 240px;
+    overflow-y: auto;
+}
+
+.explanation-text {
+    font-family: inherit;
+    font-size: 0.8rem;
+    color: #334155;
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 0;
+    line-height: 1.45;
+}
+
+/* Responsible AI Banner (Requirement 9) */
+.responsible-ai-banner {
+    border-radius: 6px;
+    padding: 0.65rem 1rem;
+    background-color: #1e293b;
+    border-color: #0f172a;
+    color: #f8fafc;
+}
+
+.responsible-ai-text {
+    font-size: 0.8rem;
+    line-height: 1.4;
+    color: #f1f5f9;
+}
+
+/* Custom Recommendation Badge Colors */
+.badge-strong {
+    background-color: #10b981 !important;
+    color: #ffffff !important;
+}
+
+.badge-good {
+    background-color: #0284c7 !important;
+    color: #ffffff !important;
+}
+
+.badge-moderate {
+    background-color: #f59e0b !important;
+    color: #ffffff !important;
+}
+
+.badge-low {
+    background-color: #94a3b8 !important;
+    color: #ffffff !important;
+}
+
+.text-strong {
+    color: #059669;
+}
+
+.text-good {
+    color: #0284c7;
+}
+
+.text-moderate {
+    color: #d97706;
+}
+
+.text-low {
+    color: #64748b;
+}
+
+.text-success {
+    color: #059669;
+}
+
+.text-warning {
+    color: #d97706;
+}
+
+.text-brand {
+    color: #0176d3;
+}
+
+.font-semibold {
+    font-weight: 600;
+}
+
+.font-bold {
+    font-weight: 700;
+}
+
+.text-right {
+    text-align: right;
+}

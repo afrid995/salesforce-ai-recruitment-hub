@@ -1,0 +1,327 @@
+<template>
+    <div class="slds-m-bottom_medium">
+        <!-- SECTION 1: HEADER BANNER -->
+        <div class="hub-header-banner slds-p-around_large slds-m-bottom_medium">
+            <div class="slds-grid slds-grid_vertical-align-center slds-wrap">
+                <div class="slds-col slds-size_1-1 slds-medium-size_8-12">
+                    <div class="slds-media slds-media_center">
+                        <div class="slds-media__figure">
+                            <span class="slds-icon_container slds-icon-standard-work-capacity-usage hub-logo-icon">
+                                <lightning-icon icon-name="standard:work_capacity_usage" size="large" alternative-text="AI Recruitment Hub"></lightning-icon>
+                            </span>
+                        </div>
+                        <div class="slds-media__body">
+                            <span class="hub-tagline slds-text-title_bold">AI-POWERED RECRUITMENT &amp; CANDIDATE MANAGEMENT</span>
+                            <h1 class="hub-title slds-text-heading_large slds-m-top_xx-small">AI Recruitment Hub</h1>
+                            <p class="hub-description slds-m-top_xx-small">
+                                Unified recruitment operations with live Salesforce analytics and autonomous Agentforce intelligence.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-col slds-size_1-1 slds-medium-size_4-12 slds-text-align_right slds-m-top_small slds-medium-m-top_none">
+                    <div class="hub-badge-group">
+                        <lightning-button 
+                            label="Open AI Recruitment Assistant" 
+                            icon-name="standard:bot" 
+                            variant="brand" 
+                            onclick={navigateToAssistant} 
+                            class="slds-m-right_x-small assistant-header-btn">
+                        </lightning-button>
+                        <lightning-button-icon 
+                            icon-name="utility:refresh" 
+                            alternative-text="Refresh Metrics" 
+                            onclick={handleRefresh} 
+                            class="refresh-btn">
+                        </lightning-button-icon>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 2: QUICK ACTIONS BAR -->
+        <div class="slds-card slds-p-around_small slds-m-bottom_medium quick-actions-card">
+            <div class="slds-grid slds-grid_vertical-align-center slds-wrap">
+                <div class="slds-col slds-size_1-1 slds-medium-size_3-12 slds-p-horizontal_small">
+                    <span class="slds-text-title_bold slds-text-color_weak">
+                        <lightning-icon icon-name="utility:touch_action" size="x-small" class="slds-m-right_xx-small"></lightning-icon>
+                        QUICK RECRUITMENT ACTIONS
+                    </span>
+                </div>
+                <div class="slds-col slds-size_1-1 slds-medium-size_9-12 slds-text-align_right slds-p-horizontal_small quick-actions-buttons">
+                    <lightning-button label="New Job Requisition" icon-name="utility:add" variant="brand" onclick={handleNewJob} class="slds-m-right_x-small"></lightning-button>
+                    <lightning-button label="New Candidate" icon-name="utility:user" variant="brand-outline" onclick={handleNewCandidate} class="slds-m-right_x-small"></lightning-button>
+                    <lightning-button label="New Application" icon-name="utility:new_window" variant="neutral" onclick={handleNewApplication} class="slds-m-right_x-small"></lightning-button>
+                    <lightning-button label="New Interview" icon-name="utility:event" variant="neutral" onclick={handleNewInterview} class="slds-m-right_x-small"></lightning-button>
+                    <lightning-button label="Ask Assistant" icon-name="standard:bot" variant="neutral" onclick={navigateToAssistant}></lightning-button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 3: RECRUITMENT KPI SECTION (4 Primary Metrics + Sub-Badges) -->
+        <div class="slds-grid slds-wrap slds-gutters slds-m-bottom_medium">
+            <!-- 1. Open Job Requisitions -->
+            <div class="slds-col slds-size_1-1 slds-small-size_1-2 slds-medium-size_3-12 slds-m-bottom_small">
+                <div class="kpi-card slds-card slds-p-around_medium" onclick={navigateToJobs} role="button" tabindex="0" title="Click to view all Open Job Requisitions">
+                    <div class="slds-grid slds-grid_vertical-align-center">
+                        <div class="kpi-icon-container kpi-blue">
+                            <lightning-icon icon-name="standard:work_capacity_usage" size="medium"></lightning-icon>
+                        </div>
+                        <div class="slds-m-left_medium slds-grow">
+                            <div class="kpi-value">{kpis.openJobs}</div>
+                            <div class="kpi-label">Open Job Requisitions</div>
+                            <span class="slds-badge slds-badge_lightest kpi-sub-badge slds-m-top_xx-small">Active Openings</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Total Candidates -->
+            <div class="slds-col slds-size_1-1 slds-small-size_1-2 slds-medium-size_3-12 slds-m-bottom_small">
+                <div class="kpi-card slds-card slds-p-around_medium" onclick={navigateToCandidates} role="button" tabindex="0" title="Click to view all Candidates">
+                    <div class="slds-grid slds-grid_vertical-align-center">
+                        <div class="kpi-icon-container kpi-purple">
+                            <lightning-icon icon-name="standard:candidate" size="medium"></lightning-icon>
+                        </div>
+                        <div class="slds-m-left_medium slds-grow">
+                            <div class="kpi-value">{kpis.totalCandidates}</div>
+                            <div class="kpi-label">Total Candidates</div>
+                            <span class="slds-badge slds-theme_success kpi-sub-badge slds-m-top_xx-small">{kpis.selectedCandidates} Selected</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Total Job Applications -->
+            <div class="slds-col slds-size_1-1 slds-small-size_1-2 slds-medium-size_3-12 slds-m-bottom_small">
+                <div class="kpi-card slds-card slds-p-around_medium" onclick={navigateToApplications} role="button" tabindex="0" title="Click to view all Job Applications">
+                    <div class="slds-grid slds-grid_vertical-align-center">
+                        <div class="kpi-icon-container kpi-orange">
+                            <lightning-icon icon-name="standard:opportunity" size="medium"></lightning-icon>
+                        </div>
+                        <div class="slds-m-left_medium slds-grow">
+                            <div class="kpi-value">{kpis.totalApplications}</div>
+                            <div class="kpi-label">Total Job Applications</div>
+                            <span class="slds-badge slds-badge_lightest kpi-sub-badge slds-m-top_xx-small">Pipeline Volume</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Total Interviews -->
+            <div class="slds-col slds-size_1-1 slds-small-size_1-2 slds-medium-size_3-12 slds-m-bottom_small">
+                <div class="kpi-card slds-card slds-p-around_medium" onclick={navigateToInterviews} role="button" tabindex="0" title="Click to view all Interviews">
+                    <div class="slds-grid slds-grid_vertical-align-center">
+                        <div class="kpi-icon-container kpi-teal">
+                            <lightning-icon icon-name="standard:event" size="medium"></lightning-icon>
+                        </div>
+                        <div class="slds-m-left_medium slds-grow">
+                            <div class="kpi-value">{kpis.totalInterviews}</div>
+                            <div class="kpi-label">Total Interviews</div>
+                            <span class="slds-badge slds-theme_warning kpi-sub-badge slds-m-top_xx-small">{kpis.upcomingInterviews} Scheduled</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 4: REPORT & DASHBOARD SHORTCUTS -->
+        <div class="slds-card slds-p-around_medium slds-m-bottom_medium report-shortcuts-card">
+            <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_small">
+                <div class="slds-media slds-media_center slds-grow">
+                    <div class="slds-media__figure">
+                        <span class="report-icon-wrapper">
+                            <lightning-icon icon-name="standard:report" size="small"></lightning-icon>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-text-title_bold slds-text-heading_small">Recruitment Reports &amp; Analytics Shortcuts</h2>
+                        <p class="slds-text-body_small slds-text-color_weak">Quick access to verified recruitment summaries and executive dashboard</p>
+                    </div>
+                </div>
+                <div>
+                    <lightning-button 
+                        label="View Recruitment Dashboard" 
+                        icon-name="standard:dashboard" 
+                        variant="brand-outline" 
+                        onclick={navigateToDashboard}>
+                    </lightning-button>
+                </div>
+            </div>
+
+            <div class="slds-grid slds-wrap slds-gutters">
+                <!-- Shortcut 1: Selected Candidates -->
+                <div class="slds-col slds-size_1-1 slds-small-size_1-2 slds-medium-size_3-12 slds-m-bottom_small">
+                    <div class="report-tile slds-p-around_small" data-report="selectedCandidatesReportId" onclick={navigateToReport} role="button" tabindex="0">
+                        <div class="slds-grid slds-grid_vertical-align-center">
+                            <lightning-icon icon-name="standard:approval" size="small" class="slds-m-right_small"></lightning-icon>
+                            <div class="report-tile-info">
+                                <div class="report-tile-title">Selected Candidates</div>
+                                <div class="report-tile-desc">Hired &amp; offer accepted list</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shortcut 2: Candidates by Status -->
+                <div class="slds-col slds-size_1-1 slds-small-size_1-2 slds-medium-size_3-12 slds-m-bottom_small">
+                    <div class="report-tile slds-p-around_small" data-report="candidatesReportId" onclick={navigateToReport} role="button" tabindex="0">
+                        <div class="slds-grid slds-grid_vertical-align-center">
+                            <lightning-icon icon-name="standard:candidate" size="small" class="slds-m-right_small"></lightning-icon>
+                            <div class="report-tile-info">
+                                <div class="report-tile-title">Candidates by Status</div>
+                                <div class="report-tile-desc">Pool breakdown &amp; stages</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shortcut 3: Open Job Requisitions -->
+                <div class="slds-col slds-size_1-1 slds-small-size_1-2 slds-medium-size_3-12 slds-m-bottom_small">
+                    <div class="report-tile slds-p-around_small" data-report="openJobsReportId" onclick={navigateToReport} role="button" tabindex="0">
+                        <div class="slds-grid slds-grid_vertical-align-center">
+                            <lightning-icon icon-name="standard:work_capacity_usage" size="small" class="slds-m-right_small"></lightning-icon>
+                            <div class="report-tile-info">
+                                <div class="report-tile-title">Open Job Requisitions</div>
+                                <div class="report-tile-desc">Openings by department</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shortcut 4: Upcoming Interviews -->
+                <div class="slds-col slds-size_1-1 slds-small-size_1-2 slds-medium-size_3-12 slds-m-bottom_small">
+                    <div class="report-tile slds-p-around_small" data-report="upcomingInterviewsReportId" onclick={navigateToReport} role="button" tabindex="0">
+                        <div class="slds-grid slds-grid_vertical-align-center">
+                            <lightning-icon icon-name="standard:event" size="small" class="slds-m-right_small"></lightning-icon>
+                            <div class="report-tile-info">
+                                <div class="report-tile-title">Upcoming Interviews</div>
+                                <div class="report-tile-desc">Scheduled rounds &amp; types</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 5: AI RECRUITMENT ASSISTANT SECTION -->
+        <div class="slds-card slds-p-around_medium slds-m-bottom_medium ai-assistant-panel">
+            <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_small">
+                <div class="slds-media slds-media_center slds-grow">
+                    <div class="slds-media__figure">
+                        <span class="ai-sparkle-icon">
+                            <lightning-icon icon-name="standard:bot" size="medium" alternative-text="Agentforce Assistant"></lightning-icon>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <div class="slds-grid slds-grid_vertical-align-center">
+                            <h2 class="slds-text-heading_medium slds-text-title_bold">AI Recruitment Assistant</h2>
+                            <span class="slds-badge slds-badge_lightest slds-m-left_small ai-status-badge">
+                                Activated Agentforce Agent
+                            </span>
+                        </div>
+                        <p class="slds-text-body_regular slds-text-color_weak slds-m-top_xxx-small">
+                            Autonomous recruitment intelligence grounded in live Salesforce data. Click any sample prompt to copy or jump to the Assistant:
+                        </p>
+                    </div>
+                </div>
+                <div>
+                    <lightning-button 
+                        label="Launch Assistant Tab" 
+                        icon-name="utility:new_window" 
+                        variant="brand" 
+                        onclick={navigateToAssistant}>
+                    </lightning-button>
+                </div>
+            </div>
+
+            <!-- Sample Prompts Carousel / Grid -->
+            <div class="slds-grid slds-wrap slds-gutters slds-m-top_x-small">
+                <template for:each={samplePrompts} for:item="prompt">
+                    <div key={prompt.id} class="slds-col slds-size_1-1 slds-medium-size_1-3 slds-m-bottom_small">
+                        <div class="prompt-chip slds-p-around_small" data-prompt={prompt.text} onclick={handlePromptClick} role="button" tabindex="0" title="Click to copy prompt">
+                            <div class="slds-grid slds-grid_vertical-align-center">
+                                <lightning-icon icon-name={prompt.icon} size="x-small" class="slds-m-right_x-small prompt-icon"></lightning-icon>
+                                <div class="prompt-content">
+                                    <div class="prompt-text">"{prompt.text}"</div>
+                                    <div class="prompt-sub">{prompt.sub}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Agentforce Status & Connection Information -->
+            <div class="ai-connection-box slds-m-top_small slds-p-around_small">
+                <div class="slds-grid slds-grid_vertical-align-center">
+                    <lightning-icon icon-name="utility:info_alt" size="small" variant="brand" class="slds-m-right_small"></lightning-icon>
+                    <div class="slds-grow">
+                        <span class="slds-text-title_bold">Direct Agentforce Integration:</span>
+                        <span class="slds-text-body_small slds-m-left_xx-small">
+                            Agent <code>AI_Recruitment_Assistant</code> is active with 5 Invocable Apex actions, 4 declarative Flows, and custom prompt templates. 
+                            Click <strong>Launch Assistant Tab</strong> above or select the <strong>AI Recruitment Assistant</strong> navigation tab to interact.
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 6: UPCOMING INTERVIEWS PREVIEW TABLE -->
+        <div class="slds-card slds-p-around_medium slds-m-bottom_medium">
+            <div class="slds-grid slds-grid_vertical-align-center slds-m-bottom_small">
+                <div class="slds-media slds-media_center slds-grow">
+                    <div class="slds-media__figure">
+                        <lightning-icon icon-name="standard:event" size="small"></lightning-icon>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-text-title_bold slds-text-heading_small">Upcoming Scheduled Interviews</h2>
+                    </div>
+                </div>
+                <lightning-button label="View All Interviews" icon-name="utility:forward" variant="base" onclick={navigateToInterviews}></lightning-button>
+            </div>
+
+            <template if:true={upcomingInterviewsList.length}>
+                <div class="slds-table_header-fixed_container">
+                    <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped">
+                        <thead>
+                            <tr class="slds-line-height_reset">
+                                <th scope="col"><div class="slds-truncate">Interview Round</div></th>
+                                <th scope="col"><div class="slds-truncate">Candidate</div></th>
+                                <th scope="col"><div class="slds-truncate">Target Position</div></th>
+                                <th scope="col"><div class="slds-truncate">Type</div></th>
+                                <th scope="col"><div class="slds-truncate">Scheduled Date &amp; Time</div></th>
+                                <th scope="col"><div class="slds-truncate">Interviewer</div></th>
+                                <th scope="col"><div class="slds-truncate">Status</div></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={upcomingInterviewsList} for:item="inv">
+                                <tr key={inv.id}>
+                                    <td><div class="slds-truncate slds-text-title_bold">{inv.name}</div></td>
+                                    <td>
+                                        <a href="javascript:void(0);" data-id={inv.candidateId} onclick={handleCandidateClick} class="slds-truncate">
+                                            {inv.candidateName}
+                                        </a>
+                                    </td>
+                                    <td><div class="slds-truncate">{inv.jobTitle}</div></td>
+                                    <td><span class="slds-badge slds-badge_lightest">{inv.interviewType}</span></td>
+                                    <td><div class="slds-truncate">{inv.formattedDateTime}</div></td>
+                                    <td><div class="slds-truncate">{inv.interviewerName}</div></td>
+                                    <td>
+                                        <span class="slds-badge slds-theme_success">{inv.status}</span>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </template>
+            <template if:false={upcomingInterviewsList.length}>
+                <div class="slds-text-align_center slds-p-around_medium slds-text-color_weak">
+                    No scheduled interviews found. Use <strong>+ New Interview</strong> above to schedule a candidate screening.
+                </div>
+            </template>
+        </div>
+    </div>
+</template>

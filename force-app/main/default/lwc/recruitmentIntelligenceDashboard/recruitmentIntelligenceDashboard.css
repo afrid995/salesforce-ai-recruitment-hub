@@ -1,0 +1,162 @@
+/* Recruitment Intelligence Dashboard Styles */
+
+.dashboard-container {
+    background-color: #f3f4f6;
+    min-height: 100%;
+}
+
+.kpi-card {
+    border-radius: 8px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    cursor: pointer;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+}
+
+.kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.kpi-icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.kpi-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #1e293b;
+}
+
+.kpi-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+/* Stage color indicators */
+.stage-applied {
+    background-color: #0284c7;
+}
+
+.stage-review {
+    background-color: #6366f1;
+}
+
+.stage-shortlisted {
+    background-color: #8b5cf6;
+}
+
+.stage-scheduled {
+    background-color: #eab308;
+}
+
+.stage-interviewed {
+    background-color: #f97316;
+}
+
+.stage-selected {
+    background-color: #10b981;
+}
+
+/* Pipeline bar */
+.pipeline-bar-container {
+    height: 10px;
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: #e2e8f0;
+    display: flex;
+}
+
+.pipeline-segment {
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+/* Attention Cards */
+.attention-card {
+    border-radius: 8px;
+    border-left: 4px solid #cbd5e1;
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.attention-high {
+    border-left-color: #ef4444;
+    background-color: #fffaf0;
+}
+
+.attention-medium {
+    border-left-color: #f59e0b;
+    background-color: #fffdf5;
+}
+
+.attention-info {
+    border-left-color: #3b82f6;
+    background-color: #f8fafc;
+}
+
+/* Table styling */
+.custom-table th {
+    background-color: #f8fafc;
+    font-weight: 600;
+    font-size: 0.75rem;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.custom-table tr:hover {
+    background-color: #f8fafc;
+}
+
+/* Score Badges */
+.badge-score-strong {
+    background-color: #dcfce7;
+    color: #15803d;
+    font-weight: 700;
+}
+
+.badge-score-good {
+    background-color: #e0f2fe;
+    color: #0369a1;
+    font-weight: 700;
+}
+
+.badge-score-moderate {
+    background-color: #fef3c7;
+    color: #b45309;
+    font-weight: 700;
+}
+
+.badge-score-low {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    font-weight: 700;
+}
+
+.badge-unavailable {
+    background-color: #f1f5f9;
+    color: #64748b;
+    font-style: italic;
+}
+
+/* Section headers */
+.section-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.section-subtext {
+    font-size: 0.8125rem;
+    color: #64748b;
+}
